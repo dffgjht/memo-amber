@@ -10,9 +10,12 @@ import androidx.room.RoomDatabase
         DiaryEntry::class,
         VaultItem::class,
         Will::class,
-        MediaItem::class
+        MediaItem::class,
+        CommunityPost::class,
+        CommunityComment::class,
+        User::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class DeathDiaryDatabase : RoomDatabase() {
@@ -20,6 +23,9 @@ abstract class DeathDiaryDatabase : RoomDatabase() {
     abstract fun vaultItemDao(): VaultItemDao
     abstract fun willDao(): WillDao
     abstract fun mediaItemDao(): MediaItemDao
+    abstract fun communityPostDao(): CommunityPostDao
+    abstract fun communityCommentDao(): CommunityCommentDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile

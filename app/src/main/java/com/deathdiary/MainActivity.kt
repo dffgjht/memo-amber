@@ -11,6 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.deathdiary.ui.screens.*
+import com.deathdiary.data.entities.CommunityPost
+import com.deathdiary.data.entities.CommunityComment
+import com.deathdiary.data.entities.User
 import com.deathdiary.ui.theme.DeathDiaryTheme
 import com.deathdiary.security.BiometricAuthManager
 import com.deathdiary.security.SecurityManager
@@ -55,6 +58,7 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToVault = { navController.navigate("vault") },
                                 onNavigateToWill = { navController.navigate("will") },
                                 onNavigateToGallery = { navController.navigate("gallery") },
+                                onNavigateToCommunity = { navController.navigate("community") },
                                 onNavigateToSettings = { navController.navigate("settings") }
                             )
                         }
@@ -79,6 +83,12 @@ class MainActivity : ComponentActivity() {
 
                         composable("gallery") {
                             GalleryScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("community") {
+                            CommunityScreen(
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

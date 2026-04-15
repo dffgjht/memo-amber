@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,6 +18,7 @@ fun HomeScreen(
     onNavigateToVault: () -> Unit,
     onNavigateToWill: () -> Unit,
     onNavigateToGallery: () -> Unit,
+    onNavigateToCommunity: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     Scaffold(
@@ -103,6 +105,15 @@ fun HomeScreen(
                     title = "回忆相册",
                     description = "珍藏的照片和视频",
                     onClick = onNavigateToGallery
+                )
+            }
+
+            item {
+                FeatureCard(
+                    icon = Icons.Default.Forum,
+                    title = "社区留言板",
+                    description = "分享经验，获得帮助",
+                    onClick = onNavigateToCommunity
                 )
             }
 
