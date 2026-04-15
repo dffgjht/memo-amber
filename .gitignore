@@ -3,7 +3,7 @@
 build/
 gradlew
 gradlew.bat
-gradle-wrapper.jar
+# gradle-wrapper.jar is needed for GitHub Actions
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -116,8 +116,7 @@ Desktop.ini
 *~.nib
 *.log
 
-# Package Files
-*.jar
+# Package Files (excluding gradle-wrapper.jar)
 *.war
 *.nar
 *.ear
