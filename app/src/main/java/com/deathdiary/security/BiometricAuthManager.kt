@@ -11,10 +11,14 @@ class BiometricAuthManager(private val context: Context) {
     private var promptInfo: BiometricPrompt.PromptInfo
 
     init {
+        // 优先使用指纹 (BIOMETRIC_STRONG 包含指纹、虹膜等强生物识别)
+        // BIOMETRIC_WEAK 包含人脸、简单生物识别
+        // 这里使用 BIOMETRIC_STRONG 来优先使用指纹
         promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("生物识别认证")
-            .setSubtitle("请使用指纹或面容ID解锁回忆录")
+            .setSubtitle("请使用指纹解锁存证纪")
             .setNegativeButtonText("使用密码")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
             .build()
     }
 
