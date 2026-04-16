@@ -4,6 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.deathdiary.data.entities.DiaryEntry
+import com.deathdiary.data.entities.VaultItem
+import com.deathdiary.data.entities.Will
+import com.deathdiary.data.entities.MediaItem
+import com.deathdiary.data.entities.CommunityPost
+import com.deathdiary.data.entities.CommunityComment
+import com.deathdiary.data.entities.User
 
 @Database(
     entities = [

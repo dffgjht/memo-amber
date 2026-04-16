@@ -1,6 +1,6 @@
 package com.deathdiary.ui.screens
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,13 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,17 +113,14 @@ fun MediaItemCard(item: MediaItem) {
                         .fillMaxWidth()
                         .height(200.dp)
                         .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(item.filePath)
-                                .crossfade(true)
-                                .build()
-                        ),
+                    Icon(
+                        imageVector = Icons.Default.Image,
                         contentDescription = item.title,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.outline
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
@@ -182,10 +173,6 @@ fun MediaItemCard(item: MediaItem) {
     }
 }
 
-fun formatDate(timestamp: Long): String {
-    val sdf = SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
-    return sdf.format(Date(timestamp))
-}
 
 data class MediaItem(
     val id: Long,

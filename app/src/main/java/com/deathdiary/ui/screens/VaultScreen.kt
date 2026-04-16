@@ -259,7 +259,7 @@ fun AddVaultItemDialog(
                     onValueChange = { password = it },
                     label = { Text("密码（可选）") },
                     singleLine = true,
-                    modifier = MaterialTheme.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = url,
@@ -294,5 +294,5 @@ data class VaultItem(
     val username: String = "",
     val password: String = "",
     val url: String = "",
-    val timestamp: Long
+    val timestamp: Long = System.currentTimeMillis()
 )

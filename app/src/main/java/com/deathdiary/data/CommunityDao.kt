@@ -62,24 +62,24 @@ interface CommunityCommentDao {
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM community_users")
+    @Query("SELECT * FROM users")
     fun getAllUsers(): Flow<List<User>>
 
-    @Query("SELECT * FROM community_users WHERE id = :userId")
+    @Query("SELECT * FROM users WHERE id = :userId")
     suspend fun getUserById(userId: Long): User?
 
-    @Query("SELECT * FROM community_users WHERE username = :username")
+    @Query("SELECT * FROM users WHERE username = :username")
     suspend fun getUserByUsername(username: String): User?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: User): Long
 
-    @Query("UPDATE community_users SET postCount = postCount + 1 WHERE id = :userId")
+    @Query("UPDATE users SET postCount = postCount + 1 WHERE id = :userId")
     suspend fun incrementPostCount(userId: Long)
 
-    @Query("UPDATE community_users SET followerCount = followerCount + 1 WHERE id = :userId")
+    @Query("UPDATE users SET followerCount = followerCount + 1 WHERE id = :userId")
     suspend fun incrementFollowerCount(userId: Long)
 
-    @Query("UPDATE community_users SET followingCount = followingCount + 1 WHERE id = :userId")
+    @Query("UPDATE users SET followingCount = followingCount + 1 WHERE id = :userId")
     suspend fun incrementFollowingCount(userId: Long)
 }

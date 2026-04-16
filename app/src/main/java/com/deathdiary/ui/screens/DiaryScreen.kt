@@ -10,8 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +105,7 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
             onSave = { title, content, mood ->
                 entries.add(
                     DiaryEntry(
-                        id = entries.size + 1,
+                        id = (entries.size + 1).toLong(),
                         title = title,
                         content = content,
                         mood = mood,
@@ -146,7 +144,7 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = formatTimestamp(entry.timestamp),
+                    text = formatTimestampFull(entry.timestamp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -247,10 +245,6 @@ fun MoodOption(value: String, emoji: String, selected: String, onSelect: (String
     )
 }
 
-fun formatTimestamp(timestamp: Long): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-    return sdf.format(Date(timestamp))
-}
 
 data class DiaryEntry(
     val id: Long,

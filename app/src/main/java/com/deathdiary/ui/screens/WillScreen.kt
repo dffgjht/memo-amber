@@ -10,8 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -323,19 +321,8 @@ fun AddWillDialog(
     )
 }
 
-fun formatDate(timestamp: Long): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    return sdf.format(Date(timestamp))
-}
 
-fun parseDate(dateStr: String): Long? {
-    return try {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        sdf.parse(dateStr)?.time
-    } catch (e: Exception) {
-        null
-    }
-}
+
 
 data class Will(
     val id: Long,

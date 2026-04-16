@@ -85,6 +85,7 @@ class DataRepository(private val apiService: ApiService) {
         return try {
             val api = RetrofitClient.createAuthenticatedApiService(token)
             val response = api.createPost(
+                "Bearer $token",
                 CreatePostRequest(content, category, tags)
             )
             if (response.isSuccessful) {
