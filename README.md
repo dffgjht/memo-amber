@@ -4,7 +4,7 @@
 
 ## 📥 下载安装
 
-**最新版本：** [v1.2.1 回忆录](https://github.com/dffgjht/death-diary/releases/tag/v1.2.1)
+**最新版本：** [v1.2.2 回忆录](https://github.com/dffgjht/death-diary/releases/tag/v1.2.2)
 
 点击上方链接下载 APK，直接安装即可使用。
 
@@ -13,7 +13,7 @@
 ### 核心功能
 - 🔐 **生物识别认证** - 指纹/面容快速解锁
 - 🔐 **AES-256 加密存储** - 军事级数据保护
-- 📔 **日记系统** - 记录每一天的心情与感悟
+- 📔 **日记系统** - 记录每一天的心情与感悟（含 GPS 位置）
 - 🔑 **密码保险箱** - 安全保管重要账号密码
 - 📜 **数字遗嘱** - 规划身后事的数字遗产
 - 📸 **回忆相册** - 保存珍贵的照片和视频
@@ -56,6 +56,7 @@
 | Room Database | 本地数据库 |
 | Material Design 3 | 设计语言 |
 | AES-256 加密 | 数据加密 |
+| BCrypt | 密码哈希 |
 | 生物识别 API | 身份认证 |
 
 ## 📁 项目结构
@@ -81,8 +82,10 @@
 ## 🔒 安全特性
 
 - **AES-256-GCM 加密** - 军事级数据保护
+- **BCrypt 密码哈希** - 防彩虹表攻击，自适应成本因子 (cost=12)
 - **Android Keystore** - 硬件级密钥存储
 - **生物识别认证** - 指纹/面容解锁
+- **Room 数据库迁移** - 安全的数据版本升级
 - **完全离线** - 数据仅存储在您的设备
 
 ## 📄 许可证
@@ -93,6 +96,7 @@ MIT License
 
 | 版本 | 更新内容 |
 |------|----------|
+| [v1.2.2](https://github.com/dffgjht/death-diary/releases/tag/v1.2.2) | 安全增强: BCrypt密码哈希、数据库迁移策略、CI/CD完善 |
 | [v1.2.1](https://github.com/dffgjht/death-diary/releases/tag/v1.2.1) | 修复后台重登闪退、编辑删除功能、GPS定位、隐私政策 |
 | [v1.2](https://github.com/dffgjht/death-diary/releases/tag/v1.2) | 修复闪退问题，优化 UI，精确日期到时分秒，本地相册 |
 | [v1.1](https://github.com/dffgjht/death-diary/releases/tag/v1.1) | 新增社区留言板功能 |
