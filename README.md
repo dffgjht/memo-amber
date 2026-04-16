@@ -4,7 +4,7 @@
 
 ## 📥 下载安装
 
-**最新版本：** [v1.2.3 回忆录](https://github.com/dffgjht/death-diary/releases/tag/v1.2.3)
+**最新版本：** [v1.2.4 回忆录](https://github.com/dffgjht/death-diary/releases/tag/v1.2.4)
 
 点击上方链接下载 APK，直接安装即可使用。
 
@@ -96,6 +96,7 @@ MIT License
 
 | 版本 | 更新内容 |
 |------|----------|
+| [v1.2.4](https://github.com/dffgjht/death-diary/releases/tag/v1.2.4) | 修复数据持久化、备份对话框、版本号显示、生物识别优先指纹、相册图片预览、应用图标更新 |
 | [v1.2.3](https://github.com/dffgjht/death-diary/releases/tag/v1.2.3) | 新增备份/恢复功能、自动锁定机制、文档精简 |
 | [v1.2.2](https://github.com/dffgjht/death-diary/releases/tag/v1.2.2) | 安全增强: BCrypt密码哈希、数据库迁移策略、CI/CD完善 |
 | [v1.2.1](https://github.com/dffgjht/death-diary/releases/tag/v1.2.1) | 修复后台重登闪退、编辑删除功能、GPS定位、隐私政策 |
