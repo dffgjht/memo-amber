@@ -38,25 +38,30 @@ fun LockScreen(
 
     // Real biometric authentication call
     if (showBiometricPrompt) {
-        val activity = LocalContext.current as FragmentActivity
-        biometricAuthManager.authenticate(
-            activity = activity,
-            onSuccess = {
-                showBiometricPrompt = false
-                onAuthSuccess()
-            },
-            onFailure = { error ->
-                showBiometricPrompt = false
-                biometricError = error
-            }
-        )
-        showBiometricPrompt = false
+        val context = LocalContext.current
+        val activity = context as? FragmentActivity
+        if (activity != null) {
+            biometricAuthManager.authenticate(
+                activity = activity,
+                onSuccess = {
+                    showBiometricPrompt = false
+                    onAuthSuccess()
+                },
+                onFailure = { error ->
+                    showBiometricPrompt = false
+                    biometricError = error
+                }
+            )
+        } else {
+            showBiometricPrompt = false
+            biometricError = "生物识别不可用"
+        }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("回忆录") },
+                title = { Text("存证纪") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
