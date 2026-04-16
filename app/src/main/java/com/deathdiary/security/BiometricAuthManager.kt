@@ -13,7 +13,7 @@ class BiometricAuthManager(private val context: Context) {
     init {
         promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("生物识别认证")
-            .setSubtitle("请使用指纹或面容ID解锁死亡日记")
+            .setSubtitle("请使用指纹或面容ID解锁回忆录")
             .setNegativeButtonText("使用密码")
             .build()
     }

@@ -4,7 +4,94 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Warm cream background circle -->
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M54,20 C54,20 30,44 30,62 C30,75.3 40.7,86 54,86 C67.3,86 78,75.3 78,62 C78,44 54,20 54,20 Z"/>
+        android:fillColor="#F5EDE0"
+        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0"/>
+
+    <!-- Book shadow -->
+    <path
+        android:fillColor="#D4C4A8"
+        android:pathData="M54,72 C36,72 22,64 22,54 L22,36 C22,32 25,29 29,29 L40,29 L40,62 C40,66 44,69 48,69 L54,69 L54,72Z"/>
+
+    <!-- Left page -->
+    <path
+        android:fillColor="#FAF3E3"
+        android:strokeColor="#C9A96E"
+        android:strokeWidth="0.5"
+        android:pathData="M54,65 C38,65 25,57.5 25,47.5 L25,31 C25,27.5 28,24.5 31.5,24.5 L42,24.5 L42,58 C42,61.5 46,64.5 50,64.5 L54,64.5Z"/>
+
+    <!-- Right page -->
+    <path
+        android:fillColor="#FFF8EE"
+        android:strokeColor="#C9A96E"
+        android:strokeWidth="0.5"
+        android:pathData="M54,65 C70,65 83,57.5 83,47.5 L83,31 C83,27.5 80,24.5 76.5,24.5 L66,24.5 L66,58 C66,61.5 62,64.5 58,64.5 L54,64.5Z"/>
+
+    <!-- Book spine -->
+    <path
+        android:fillColor="#8B6914"
+        android:pathData="M52,24.5 L52,65 L56,65 L56,24.5Z"/>
+
+    <!-- Bookmark ribbon (red heart style) -->
+    <path
+        android:fillColor="#C0392B"
+        android:pathData="M54,26 L60,34 Q62,36 60,38 Q58,40 54,44 Q50,40 48,38 Q46,36 48,34Z"/>
+
+    <!-- Page lines (left page) -->
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M29,34 L49,34"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M29,38 L49,38"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M29,42 L49,42"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M29,46 L45,46"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M29,50 L47,50"/>
+
+    <!-- Page lines (right page) -->
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M59,34 L79,34"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M59,38 L79,38"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M59,42 L79,42"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M59,46 L73,46"/>
+    <path
+        android:strokeColor="#E8D9BC"
+        android:strokeWidth="0.8"
+        android:pathData="M59,50 L75,50"/>
+
+    <!-- Book bottom -->
+    <path
+        android:fillColor="#C9A96E"
+        android:pathData="M25,64 C25,70 36,74 54,74 C72,74 83,70 83,64 L83,65 C83,71 72,75 54,75 C36,75 25,71 25,65Z"/>
+
+    <!-- Golden highlight on pages -->
+    <path
+        android:fillColor="#F0D080"
+        android:fillAlpha="0.3"
+        android:pathData="M30,28 L50,28 L50,30 L30,30Z"/>
+
 </vector>

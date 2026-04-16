@@ -123,7 +123,7 @@ fun SettingsScreen(
                 SettingItem(
                     icon = Icons.Default.Info,
                     title = "版本",
-                    description = "1.0.0"
+                    description = "1.2.0"
                 )
                 Divider()
                 SettingItem(

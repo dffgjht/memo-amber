@@ -1,14 +1,17 @@
 package com.deathdiary.ui.screens
 
+import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.deathdiary.security.BiometricAuthManager
 import com.deathdiary.security.SecurityManager
 
@@ -24,6 +27,7 @@ fun LockScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var showBiometricPrompt by remember { mutableStateOf(false) }
+    var biometricError by remember { mutableStateOf("") }
 
     // Auto-trigger biometric if available and not first time
     LaunchedEffect(Unit) {
@@ -32,16 +36,27 @@ fun LockScreen(
         }
     }
 
+    // Real biometric authentication call
     if (showBiometricPrompt) {
-        // Biometric authentication would be handled here
-        // For now, we'll skip this and show password option
+        val activity = LocalContext.current as FragmentActivity
+        biometricAuthManager.authenticate(
+            activity = activity,
+            onSuccess = {
+                showBiometricPrompt = false
+                onAuthSuccess()
+            },
+            onFailure = { error ->
+                showBiometricPrompt = false
+                biometricError = error
+            }
+        )
         showBiometricPrompt = false
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("死亡日记") },
+                title = { Text("回忆录") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer

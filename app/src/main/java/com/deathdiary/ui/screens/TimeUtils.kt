@@ -39,6 +39,14 @@ fun formatDate(timestamp: Long): String {
 }
 
 /**
+ * 将毫秒时间戳格式化为完整日期时间字符串（yyyy年MM月dd日 HH:mm）
+ */
+fun formatDateTimeFull(timestamp: Long): String {
+    val sdf = SimpleDateFormat("yyyy年MM月dd日 HH:mm", Locale.getDefault())
+    return sdf.format(Date(timestamp))
+}
+
+/**
  * 将毫秒时间戳格式化为短日期字符串（yyyy-MM-dd）
  */
 fun formatDateShort(timestamp: Long): String {
