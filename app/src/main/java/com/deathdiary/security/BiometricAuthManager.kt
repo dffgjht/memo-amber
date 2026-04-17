@@ -11,22 +11,41 @@ class BiometricAuthManager(private val context: Context) {
     private var promptInfo: BiometricPrompt.PromptInfo
 
     init {
-        // 优先使用指纹 (BIOMETRIC_STRONG 包含指纹、虹膜等强生物识别)
+        // 支持指纹和人脸识别
+        // BIOMETRIC_STRONG 包含指纹、虹膜等强生物识别
         // BIOMETRIC_WEAK 包含人脸、简单生物识别
-        // 这里使用 BIOMETRIC_STRONG 来优先使用指纹
+        // 使用 BIOMETRIC_STRONG | BIOMETRIC_WEAK 支持两种方式，优先使用强认证（指纹）
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or 
+                             BiometricManager.Authenticators.BIOMETRIC_WEAK
+        
         promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("生物识别认证")
-            .setSubtitle("请使用指纹解锁存证纪")
+            .setTitle("存证纪解锁")
+            .setSubtitle("请使用指纹或面容解锁")
             .setNegativeButtonText("使用密码")
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+            .setAllowedAuthenticators(authenticators)
             .build()
     }
 
     fun canAuthenticate(): Boolean {
         val biometricManager = BiometricManager.from(context)
+        // 先检查强认证（指纹），再检查弱认证（人脸）
         return when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
             BiometricManager.BIOMETRIC_SUCCESS -> true
-            else -> false
+            else -> when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
+                BiometricManager.BIOMETRIC_SUCCESS -> true
+                else -> false
+            }
+        }
+    }
+
+    fun getBiometricStatus(): String {
+        val biometricManager = BiometricManager.from(context)
+        return when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> "指纹识别可用"
+            else -> when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
+                BiometricManager.BIOMETRIC_SUCCESS -> "人脸识别可用"
+                else -> "设备不支持生物识别"
+            }
         }
     }
 
