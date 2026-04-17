@@ -4,7 +4,7 @@
 
 ## 📥 下载安装
 
-**最新版本：** [v1.2.5 存证纪](https://github.com/dffgjht/death-diary/releases/tag/v1.2.5)
+**最新版本：** [v1.3.0 存证纪](https://github.com/dffgjht/death-diary/releases/tag/v1.3.0)
 
 点击上方链接下载 APK，直接安装即可使用。
 
@@ -52,7 +52,7 @@
 ## 🔧 技术栈
 
 | 技术 | 说明 |
-:|------|------|
+|:------|------|
 | Kotlin 1.9.20 | 编程语言 |
 | Jetpack Compose | 现代 UI 框架 |
 | Room Database | 本地数据库 |
@@ -117,7 +117,8 @@ MIT License
 ## 📌 版本历史
 
 | 版本 | 更新内容 |
-:|------|----------|
+|:------|----------|
+| [v1.3.0](https://github.com/dffgjht/death-diary/releases/tag/v1.3.0) | 修复 Room 数据库实体与列名映射问题，优化社区功能性能 |
 | [v1.2.5](https://github.com/dffgjht/death-diary/releases/tag/v1.2.5) | 修复密码保险箱编辑闪退、相册预览、遗嘱支持短信/邮件发送、生物识别完善（指纹 + 人脸） |
 | [v1.2.4](https://github.com/dffgjht/death-diary/releases/tag/v1.2.4) | 修复数据持久化、备份对话框、版本号显示、生物识别优先指纹、相册图片预览、应用图标更新 |
 | [v1.2.3](https://github.com/dffgjht/death-diary/releases/tag/v1.2.3) | 新增备份/恢复功能、自动锁定机制、文档精简 |
