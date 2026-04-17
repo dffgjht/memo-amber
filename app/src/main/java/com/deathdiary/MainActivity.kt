@@ -1,4 +1,4 @@
-﻿package com.deathdiary
+package com.deathdiary
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,9 +13,11 @@ import androidx.navigation.compose.rememberNavController
 import com.deathdiary.ui.screens.*
 import com.deathdiary.ui.theme.DeathDiaryTheme
 import com.deathdiary.security.SecurityManager
+import com.deathdiary.utils.PermissionUtils
 
 class MainActivity : ComponentActivity() {
     private lateinit var securityManager: SecurityManager
+    private var permissionsGranted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+
+                    // 请求权限
+                    PermissionUtils.RequestPermissions(onAllGranted = {
+                        permissionsGranted = true
+                    })
 
                     NavHost(
                         navController = navController,

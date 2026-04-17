@@ -1,4 +1,4 @@
-﻿package com.deathdiary.ui.screens
+package com.deathdiary.ui.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -59,35 +59,43 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
-        val newItems = uris.mapIndexed { index, uri ->
-            val savedPath = MediaUtils.copyUriToInternalStorage(context, uri, "gallery") ?: uri.toString()
-            MediaItem(
-                id = (mediaItems.maxOfOrNull { it.id } ?: 0) + 1 + index,
-                title = "New Photo",
-                description = "",
-                filePath = savedPath,
-                type = "image",
-                timestamp = System.currentTimeMillis()
-            )
+        try {
+            val newItems = uris.mapIndexed { index, uri ->
+                val savedPath = MediaUtils.copyUriToInternalStorage(context, uri, "gallery") ?: uri.toString()
+                MediaItem(
+                    id = (mediaItems.maxOfOrNull { it.id } ?: 0) + 1 + index,
+                    title = "New Photo",
+                    description = "",
+                    filePath = savedPath,
+                    type = "image",
+                    timestamp = System.currentTimeMillis()
+                )
+            }
+            mediaItems = mediaItems + newItems
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        mediaItems = mediaItems + newItems
     }
 
     val videoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
-        val newItems = uris.mapIndexed { index, uri ->
-            val savedPath = MediaUtils.copyUriToInternalStorage(context, uri, "gallery_video") ?: uri.toString()
-            MediaItem(
-                id = (mediaItems.maxOfOrNull { it.id } ?: 0) + 1 + index,
-                title = "New Video",
-                description = "",
-                filePath = savedPath,
-                type = "video",
-                timestamp = System.currentTimeMillis()
-            )
+        try {
+            val newItems = uris.mapIndexed { index, uri ->
+                val savedPath = MediaUtils.copyUriToInternalStorage(context, uri, "gallery_video") ?: uri.toString()
+                MediaItem(
+                    id = (mediaItems.maxOfOrNull { it.id } ?: 0) + 1 + index,
+                    title = "New Video",
+                    description = "",
+                    filePath = savedPath,
+                    type = "video",
+                    timestamp = System.currentTimeMillis()
+                )
+            }
+            mediaItems = mediaItems + newItems
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        mediaItems = mediaItems + newItems
     }
 
     Scaffold(
@@ -165,7 +173,13 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredItems) { item ->
-                        MediaGridItem(item = item, onClick = { showPreviewDialog = item })
+                        MediaGridItem(item = item, onClick = {
+                            try {
+                                showPreviewDialog = item
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        })
                     }
                 }
             }
@@ -173,19 +187,32 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
     }
 
     showPreviewDialog?.let { item ->
-        MediaPreviewDialog(item = item, onDismiss = { showPreviewDialog = null })
+        try {
+            MediaPreviewDialog(item = item, onDismiss = { showPreviewDialog = null })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            showPreviewDialog = null
+        }
     }
 
     if (showAddDialog) {
         AddMediaDialog(
             onDismiss = { showAddDialog = false },
             onPickPhoto = {
-                photoPickerLauncher.launch("image/*")
-                showAddDialog = false
+                try {
+                    photoPickerLauncher.launch("image/*")
+                    showAddDialog = false
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             },
             onPickVideo = {
-                videoPickerLauncher.launch("video/*")
-                showAddDialog = false
+                try {
+                    videoPickerLauncher.launch("video/*")
+                    showAddDialog = false
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         )
     }
@@ -216,25 +243,34 @@ fun MediaGridItem(item: MediaItem, onClick: () -> Unit = {}) {
                 contentAlignment = Alignment.Center
             ) {
                 if (item.filePath.isNotBlank() && MediaUtils.isFileAccessible(item.filePath)) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(context)
-                                .data(MediaUtils.pathToLoadableUri(item.filePath))
-                                .crossfade(true)
-                                .build()
-                        ),
-                        contentDescription = item.title,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    if (item.type == "video") {
+                    try {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                ImageRequest.Builder(context)
+                                    .data(MediaUtils.pathToLoadableUri(item.filePath))
+                                    .crossfade(true)
+                                    .build()
+                            ),
+                            contentDescription = item.title,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        if (item.type == "video") {
+                            Icon(
+                                imageVector = Icons.Default.PlayCircle,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50)),
+                                tint = Color.White
+                            )
+                        }
+                    } catch (e: Exception) {
                         Icon(
-                            imageVector = Icons.Default.PlayCircle,
+                            imageVector = Icons.Default.BrokenImage,
                             contentDescription = null,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50)),
-                            tint = Color.White
+                            modifier = Modifier.size(48.dp),
+                            tint = Color.Gray
                         )
                     }
                 } else {
@@ -303,11 +339,11 @@ fun MediaGridItem(item: MediaItem, onClick: () -> Unit = {}) {
                         text = item.description,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1
+                        maxLines = 2
                     )
                 }
                 Text(
-                    text = formatDateShort(item.timestamp),
+                    text = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()).format(java.util.Date(item.timestamp)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -321,70 +357,93 @@ fun MediaPreviewDialog(item: MediaItem, onDismiss: () -> Unit) {
     val context = LocalContext.current
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .fillMaxHeight(0.85f),
-            shape = RoundedCornerShape(16.dp)
-        ) {
+        Card(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.85f), shape = RoundedCornerShape(16.dp)) {
             Column {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
-                }
-                if (item.filePath.isNotBlank() && MediaUtils.isFileAccessible(item.filePath)) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(context)
-                                .data(MediaUtils.pathToLoadableUri(item.filePath))
-                                .crossfade(true)
-                                .build()
-                        ),
-                        contentDescription = item.title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp)
-                            .weight(1f),
-                        contentScale = ContentScale.Fit
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .padding(32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = Icons.Default.BrokenImage,
-                                contentDescription = null,
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.outline
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("Preview unavailable", color = MaterialTheme.colorScheme.outline)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(item.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        if (item.description.isNotBlank()) {
+                            Text(item.description, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
                         }
                     }
+                    IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
                 }
-                if (item.description.isNotBlank()) {
-                    Text(
-                        text = item.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    try {
+                        if (item.filePath.isNotBlank() && MediaUtils.isFileAccessible(item.filePath)) {
+                            if (item.type == "video") {
+                                Icon(
+                                    imageVector = Icons.Default.PlayCircle,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(80.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "Video Preview",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            } else {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(context)
+                                            .data(MediaUtils.pathToLoadableUri(item.filePath))
+                                            .build()
+                                    ),
+                                    contentDescription = item.title,
+                                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Default.BrokenImage,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(80.dp),
+                                    tint = MaterialTheme.colorScheme.outline
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Image not available",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "The file may have been moved or deleted",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = null,
+                                modifier = Modifier.size(80.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Failed to load media",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -392,111 +451,36 @@ fun MediaPreviewDialog(item: MediaItem, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun AddMediaDialog(
-    onDismiss: () -> Unit,
-    onPickPhoto: () -> Unit,
-    onPickVideo: () -> Unit
-) {
+fun AddMediaDialog(onDismiss: () -> Unit, onPickPhoto: () -> Unit, onPickVideo: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
-        Card(
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier.fillMaxWidth(0.85f)
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+        Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(16.dp)) {
+            Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    "Add Memory",
+                    text = "Add Memory",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    "Select photos or videos from your album",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onPickPhoto() },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                Spacer(modifier = Modifier.height(20.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    FilledTonalButton(
+                        onClick = onPickPhoto,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.primary
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PhotoLibrary,
-                                contentDescription = null,
-                                modifier = Modifier.padding(10.dp).size(28.dp),
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text("Photos",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text("Select from album",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
-                        }
+                        Icon(Icons.Default.PhotoLibrary, null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Pick Photos")
+                    }
+                    FilledTonalButton(
+                        onClick = onPickVideo,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Videocam, null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Pick Videos")
                     }
                 }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onPickVideo() },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.secondary
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Videocam,
-                                contentDescription = null,
-                                modifier = Modifier.padding(10.dp).size(28.dp),
-                                tint = MaterialTheme.colorScheme.onSecondary
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text("Videos",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer)
-                            Text("Select from album",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f))
-                        }
-                    }
-                }
-
-                TextButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.align(Alignment.End)
-                ) {
+                Spacer(modifier = Modifier.height(12.dp))
+                TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
                     Text("Cancel")
                 }
             }

@@ -35,10 +35,22 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
         )
     }
 
-    val editingItem = editingItemId?.let { id -> items.find { it.id == id } }
+    val editingItem = editingItemId?.let { id ->
+        try {
+            items.find { it.id == id }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     val filteredItems = remember(searchQuery, items) {
-        if (searchQuery.isBlank()) items else items.filter { it.title.contains(searchQuery, ignoreCase = true) }
+        try {
+            if (searchQuery.isBlank()) items else items.filter { it.title.contains(searchQuery, ignoreCase = true) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            items
+        }
     }
 
     Scaffold(
@@ -73,7 +85,14 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(filteredItems) { item ->
-                        VaultItemCard(item = item, onClick = { editingItemId = item.id; showAddDialog = true })
+                        VaultItemCard(item = item, onClick = {
+                            try {
+                                editingItemId = item.id
+                                showAddDialog = true
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        })
                     }
                 }
             }
@@ -81,13 +100,20 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
     }
 
     if (showAddDialog) {
-        AddVaultItemFullDialog(existingItem = editingItem, onDismiss = { showAddDialog = false; editingItemId = null },
+        AddVaultItemFullDialog(existingItem = editingItem, onDismiss = {
+            showAddDialog = false
+            editingItemId = null
+        },
             onSave = { savedItem ->
-                val idx = items.indexOfFirst { it.id == savedItem.id }
-                if (idx >= 0) {
-                    items[idx] = savedItem
-                } else {
-                    items.add(savedItem)
+                try {
+                    val idx = items.indexOfFirst { it.id == savedItem.id }
+                    if (idx >= 0) {
+                        items[idx] = savedItem
+                    } else {
+                        items.add(savedItem)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
                 showAddDialog = false
                 editingItemId = null
@@ -152,13 +178,17 @@ fun AddVaultItemFullDialog(existingItem: VaultItem?, onDismiss: () -> Unit, onSa
 
     // Initialize with existing data when editing
     LaunchedEffect(existingItem) {
-        existingItem?.let {
-            title = it.title
-            category = it.category
-            content = it.content
-            username = it.username
-            password = it.password
-            url = it.url
+        try {
+            existingItem?.let {
+                title = it.title
+                category = it.category
+                content = it.content
+                username = it.username
+                password = it.password
+                url = it.url
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -174,14 +204,18 @@ fun AddVaultItemFullDialog(existingItem: VaultItem?, onDismiss: () -> Unit, onSa
                     Text(if (existingItem != null) "Edit Item" else "Add Vault Item",
                         style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     TextButton(onClick = {
-                        if (title.isNotBlank()) {
-                            val savedItem = VaultItem(
-                                id = if (existingItem != null && existingItem.id > 0) existingItem.id else System.currentTimeMillis(),
-                                title = title, category = category, content = content,
-                                username = username, password = password, url = url,
-                                timestamp = existingItem?.timestamp ?: System.currentTimeMillis()
-                            )
-                            onSave(savedItem)
+                        try {
+                            if (title.isNotBlank()) {
+                                val savedItem = VaultItem(
+                                    id = if (existingItem != null && existingItem.id > 0) existingItem.id else System.currentTimeMillis(),
+                                    title = title, category = category, content = content,
+                                    username = username, password = password, url = url,
+                                    timestamp = existingItem?.timestamp ?: System.currentTimeMillis()
+                                )
+                                onSave(savedItem)
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }, enabled = title.isNotBlank()) {
                         Text("Save", fontWeight = FontWeight.Bold,

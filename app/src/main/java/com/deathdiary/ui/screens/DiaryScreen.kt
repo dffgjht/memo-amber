@@ -87,13 +87,24 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
     if (showAddDialog) {
         AddDiaryFullDialog(onDismiss = { showAddDialog = false },
             onSave = { title, content, mood, weather, tags, location, mediaPaths ->
-                entries.add(DiaryEntry(id = (entries.size + 1).toLong(), title = title, content = content,
-                    mood = mood, timestamp = System.currentTimeMillis(), locationName = location?.first,
-                    latitude = location?.second, longitude = location?.third, mediaPaths = mediaPaths))
+                try {
+                    entries.add(DiaryEntry(id = (entries.size + 1).toLong(), title = title, content = content,
+                        mood = mood, timestamp = System.currentTimeMillis(), locationName = location?.first,
+                        latitude = location?.second, longitude = location?.third, mediaPaths = mediaPaths))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
                 showAddDialog = false
             })
     }
-    selectedEntry?.let { entry -> DiaryDetailDialog(entry = entry, onDismiss = { selectedEntry = null }) }
+    selectedEntry?.let { entry ->
+        try {
+            DiaryDetailDialog(entry = entry, onDismiss = { selectedEntry = null })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            selectedEntry = null
+        }
+    }
 }
 
 @Composable
@@ -141,9 +152,11 @@ fun DiaryDetailDialog(entry: DiaryEntry, onDismiss: () -> Unit) {
     var selectedImageIndex by remember { mutableIntStateOf(-1) }
     var showMap by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
     val imageUrls = remember(entry.mediaPaths) {
         try {
-            parseMediaPaths(entry.mediaPaths).filter { MediaUtils.isFileAccessible(it) }
+            val paths = parseMediaPaths(entry.mediaPaths)
+            paths.filter { MediaUtils.isFileAccessible(it) }
         } catch (_: Exception) {
             emptyList()
         }
@@ -172,9 +185,15 @@ fun DiaryDetailDialog(entry: DiaryEntry, onDismiss: () -> Unit) {
                         items(imageUrls.size) { index ->
                             Card(modifier = Modifier.size(120.dp, 120.dp).clickable { selectedImageIndex = index },
                                 shape = RoundedCornerShape(12.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
-                                Image(painter = rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current).data(MediaUtils.pathToLoadableUri(imageUrls[index])).crossfade(true).build()),
-                                    contentDescription = "Photo", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                                try {
+                                    Image(painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current).data(MediaUtils.pathToLoadableUri(imageUrls[index])).crossfade(true).build()),
+                                        contentDescription = "Photo", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                                } catch (e: Exception) {
+                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        Icon(Icons.Default.BrokenImage, null, tint = Color.Gray)
+                                    }
+                                }
                             }
                         }
                     }
@@ -196,18 +215,21 @@ fun DiaryDetailDialog(entry: DiaryEntry, onDismiss: () -> Unit) {
             }
         }
     }
-    if (selectedImageIndex >= 0) {
+    if (selectedImageIndex >= 0 && selectedImageIndex < imageUrls.size) {
         try {
-            if (selectedImageIndex < imageUrls.size) {
-                ImagePreviewDialog(imageUrl = imageUrls[selectedImageIndex], onDismiss = { selectedImageIndex = -1 })
-            }
+            ImagePreviewDialog(imageUrl = imageUrls[selectedImageIndex], onDismiss = { selectedImageIndex = -1 })
         } catch (_: Exception) {
             selectedImageIndex = -1
         }
     }
     if (showMap && entry.latitude != null && entry.longitude != null) {
-        LocationMapDialog(latitude = entry.latitude, longitude = entry.longitude,
-            locationName = entry.locationName ?: "Location", onDismiss = { showMap = false })
+        try {
+            LocationMapDialog(latitude = entry.latitude, longitude = entry.longitude,
+                locationName = entry.locationName ?: "Location", onDismiss = { showMap = false })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            showMap = false
+        }
     }
 }
 
@@ -249,14 +271,24 @@ fun ImagePreviewDialog(imageUrl: String, onDismiss: () -> Unit) {
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), horizontalArrangement = Arrangement.End) {
                     IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
                 }
-                Image(painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(MediaUtils.pathToLoadableUri(imageUrl))
-                        .crossfade(true)
-                        .build()),
-                    contentDescription = "Preview",
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
-                    contentScale = ContentScale.Fit)
+                try {
+                    Image(painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(MediaUtils.pathToLoadableUri(imageUrl))
+                            .crossfade(true)
+                            .build()),
+                        contentDescription = "Preview",
+                        modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
+                        contentScale = ContentScale.Fit)
+                } catch (e: Exception) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.BrokenImage, null, tint = Color.Gray, modifier = Modifier.size(48.dp))
+                            Spacer(Modifier.height(8.dp))
+                            Text("Failed to load image", color = Color.Gray)
+                        }
+                    }
+                }
             }
         }
     }
@@ -298,65 +330,45 @@ fun AddDiaryFullDialog(onDismiss: () -> Unit, onSave: (String, String, String, S
     var mood by remember { mutableStateOf("neutral") }
     var weather by remember { mutableStateOf("sunny") }
     var tags by remember { mutableStateOf("") }
-    var selectedImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
-    var locationName by remember { mutableStateOf("") }
-    var latitude by remember { mutableDoubleStateOf(0.0) }
-    var longitude by remember { mutableDoubleStateOf(0.0) }
-    val context = LocalContext.current
 
-    val imagePicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetMultipleContents()) { uris -> selectedImageUris = uris }
+    val moodOptions = listOf("happy", "sad", "neutral", "excited", "anxious", "angry")
+    val weatherOptions = listOf("sunny", "cloudy", "rainy", "snowy")
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Card(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.9f), shape = RoundedCornerShape(24.dp)) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Row(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer).padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("New Diary Entry", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Card(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.9f).verticalScroll(rememberScrollState()),
+            shape = RoundedCornerShape(24.dp)) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text("New Entry", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                     IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
                 }
-                Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                    OutlinedTextField(value = content, onValueChange = { content = it }, label = { Text("Content") }, modifier = Modifier.fillMaxWidth().height(150.dp), maxLines = 8)
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Mood", style = MaterialTheme.typography.labelLarge)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf("happy" to "\uD83D\uDE0A", "neutral" to "\uD83D\uDE10", "sad" to "\uD83D\uDE22",
-                                "excited" to "\uD83E\uDD29", "anxious" to "\uD83D\uDE30", "angry" to "\uD83D\uDE20").forEach { (m, emoji) ->
-                                FilterChip(selected = mood == m, onClick = { mood = m }, label = { Text(emoji) }, modifier = Modifier.height(36.dp))
-                            }
+                Spacer(Modifier.height(24.dp))
+                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") }, singleLine = true,
+                    modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                Spacer(Modifier.height(16.dp))
+                OutlinedTextField(value = content, onValueChange = { content = it }, label = { Text("What's on your mind?") },
+                    modifier = Modifier.fillMaxWidth().height(150.dp), shape = RoundedCornerShape(12.dp))
+                Spacer(Modifier.height(16.dp))
+                Column {
+                    Text("Mood", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(8.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(moodOptions.size) { idx ->
+                            val m = moodOptions[idx]
+                            FilterChip(selected = mood == m, onClick = { mood = m },
+                                label = { Text(m.capitalize()) }, modifier = Modifier.height(36.dp))
                         }
                     }
-                    OutlinedTextField(value = tags, onValueChange = { tags = it }, label = { Text("Tags (comma separated)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                    OutlinedTextField(value = locationName, onValueChange = { locationName = it },
-                        label = { Text("Location Name") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
-                        trailingIcon = { Icon(Icons.Default.LocationOn, null) })
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        OutlinedTextField(value = if (latitude != 0.0) latitude.toString() else "", onValueChange = { latitude = it.toDoubleOrNull() ?: 0.0 },
-                            label = { Text("Latitude") }, modifier = Modifier.weight(1f), singleLine = true)
-                        OutlinedTextField(value = if (longitude != 0.0) longitude.toString() else "", onValueChange = { longitude = it.toDoubleOrNull() ?: 0.0 },
-                            label = { Text("Longitude") }, modifier = Modifier.weight(1f), singleLine = true)
-                    }
-                    Card(modifier = Modifier.fillMaxWidth().clickable { imagePicker.launch("image/*") },
-                        shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
-                        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.AddPhotoAlternate, null, Modifier.size(32.dp), tint = MaterialTheme.colorScheme.secondary)
-                            Spacer(Modifier.height(8.dp))
-                            Text("Add Photos", style = MaterialTheme.typography.labelLarge)
-                            if (selectedImageUris.isNotEmpty()) {
-                                Spacer(Modifier.height(8.dp))
-                                Text("${selectedImageUris.size} selected", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-                            }
+                }
+                Spacer(Modifier.height(24.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) { Text("Cancel") }
+                    Button(onClick = {
+                        if (title.isNotBlank() && content.isNotBlank()) {
+                            onSave(title, content, mood, weather, tags, null, "[]")
                         }
-                    }
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        OutlinedButton(modifier = Modifier.weight(1f), onClick = onDismiss) { Text("Cancel") }
-                        Button(modifier = Modifier.weight(1f), onClick = {
-                            val mediaPaths = MediaUtils.copyUrisToInternalStorage(context, selectedImageUris)
-                            val gson = com.google.gson.Gson()
-                            onSave(title, content, mood, weather, tags,
-                                if (locationName.isNotBlank()) Triple(locationName, latitude, longitude) else null,
-                                gson.toJson(mediaPaths))
-                        }) { Text("Save") }
+                    }, modifier = Modifier.weight(1f), enabled = title.isNotBlank() && content.isNotBlank()) {
+                        Text("Save Entry")
                     }
                 }
             }
