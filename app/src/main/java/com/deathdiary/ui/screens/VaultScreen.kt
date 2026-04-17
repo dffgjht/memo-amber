@@ -24,6 +24,7 @@ import com.deathdiary.data.entities.VaultItem
 fun VaultScreen(onNavigateBack: () -> Unit) {
     var showAddDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var editingItem by remember { mutableStateOf<VaultItem?>(null) }
 
     val items = remember {
         mutableStateListOf(
@@ -124,7 +125,7 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredItems) { item ->
-                        VaultItemCard(item = item)
+                        VaultItemCard(item = item, onClick = { editingItem = item })
                     }
                 }
             }
@@ -151,10 +152,39 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
             }
         )
     }
+
+    // 编辑项目对话框
+    editingItem?.let { item ->
+        EditVaultItemDialog(
+            item = item,
+            onDismiss = { editingItem = null },
+            onSave = { title, category, content, username, password, url ->
+                val index = items.indexOfFirst { it.id == item.id }
+                if (index >= 0) {
+                    items[index] = item.copy(
+                        title = title,
+                        category = category,
+                        content = content,
+                        username = username,
+                        password = password,
+                        url = url
+                    )
+                }
+                editingItem = null
+            },
+            onDelete = {
+                items.remove(item)
+                editingItem = null
+            }
+        )
+    }
 }
 
 @Composable
-fun VaultItemCard(item: VaultItem) {
+fun VaultItemCard(
+    item: VaultItem,
+    onClick: () -> Unit = {}
+) {
     val categoryIcon = when (item.category) {
         "accounts" -> Icons.Default.Person
         "documents" -> Icons.Default.Description
@@ -166,7 +196,8 @@ fun VaultItemCard(item: VaultItem) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -405,5 +436,215 @@ fun AddVaultItemFullDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun EditVaultItemDialog(
+    item: VaultItem,
+    onDismiss: () -> Unit,
+    onSave: (String, String, String, String, String, String) -> Unit,
+    onDelete: () -> Unit
+) {
+    var title by remember { mutableStateOf(item.title) }
+    var category by remember { mutableStateOf(item.category) }
+    var content by remember { mutableStateOf(item.content) }
+    var username by remember { mutableStateOf(item.username) }
+    var password by remember { mutableStateOf(item.password) }
+    var url by remember { mutableStateOf(item.url) }
+    var expanded by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+
+    val categoryOptions = listOf(
+        "accounts" to "💳 账号密码",
+        "documents" to "📄 重要文档",
+        "notes" to "📝 私人笔记",
+        "cards" to "💳 银行卡"
+    )
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .fillMaxHeight(0.85f),
+            shape = RoundedCornerShape(24.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("取消", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                    Text("编辑项目",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    TextButton(
+                        onClick = {
+                            if (title.isNotBlank()) {
+                                onSave(title, category, content, username, password, url)
+                            }
+                        },
+                        enabled = title.isNotBlank()
+                    ) {
+                        Text("保存",
+                            fontWeight = FontWeight.Bold,
+                            color = if (title.isNotBlank())
+                                MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.outline)
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text("标题 *") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = { Icon(Icons.Default.Title, contentDescription = null) }
+                    )
+
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+                        OutlinedTextField(
+                            value = categoryOptions.find { it.first == category }?.second ?: "选择分类",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("分类") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            categoryOptions.forEach { (value, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        category = value
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    OutlinedTextField(
+                        value = content,
+                        onValueChange = { content = it },
+                        label = { Text("内容描述") },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp),
+                        minLines = 3,
+                        maxLines = 6,
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = { Icon(Icons.Default.Description, contentDescription = null) }
+                    )
+
+                    Divider()
+
+                    Text("账号信息（可选）",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold)
+
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("用户名 / 账号") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) }
+                    )
+
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("密码") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) }
+                    )
+
+                    OutlinedTextField(
+                        value = url,
+                        onValueChange = { url = it },
+                        label = { Text("网址链接") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = { Icon(Icons.Default.Link, contentDescription = null) }
+                    )
+
+                    Divider()
+
+                    // 删除按钮
+                    OutlinedButton(
+                        onClick = { showDeleteConfirm = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("删除此项目")
+                    }
+                }
+            }
+        }
+    }
+
+    // 删除确认对话框
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text("确认删除") },
+            text = { Text("确定要删除「${item.title}」吗？此操作不可撤销。") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDeleteConfirm = false
+                        onDelete()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("删除")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text("取消")
+                }
+            }
+        )
     }
 }
