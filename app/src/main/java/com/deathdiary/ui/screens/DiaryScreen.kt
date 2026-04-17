@@ -1,4 +1,4 @@
-﻿package com.deathdiary.ui.screens
+package com.deathdiary.ui.screens
 
 import com.deathdiary.data.entities.DiaryEntry
 import android.net.Uri
@@ -98,27 +98,36 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
 
 @Composable
 fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(2.dp), onClick = onClick) {
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(entry.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                Text(entry.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 MoodBadge(mood = entry.mood)
             }
-            Spacer(Modifier.height(10.dp))
-            Text(entry.content, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 4)
+            Spacer(Modifier.height(8.dp))
+            Text(entry.content, style = MaterialTheme.typography.bodyMedium, color = Color.Gray, maxLines = 2)
             Spacer(Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.CalendarToday, null, Modifier.size(14.dp), tint = MaterialTheme.colorScheme.outline)
-                    Spacer(Modifier.width(4.dp))
-                    Text(formatTimestampFull(entry.timestamp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
-                }
-                if (entry.locationName != null) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.LocationOn, null, Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(4.dp))
-                        Text(entry.locationName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                Text(TimeUtils.formatTime(entry.timestamp), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (entry.latitude != null && entry.longitude != null) {
+                        Surface(color = MaterialTheme.colorScheme.primaryContainer.copy(0.5f), shape = RoundedCornerShape(8.dp)) {
+                            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.LocationOn, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text(entry.locationName ?: "Location", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+                    if (!entry.mediaPaths.isNullOrBlank() && entry.mediaPaths != "[]") {
+                        Surface(color = MaterialTheme.colorScheme.secondaryContainer.copy(0.5f), shape = RoundedCornerShape(8.dp)) {
+                            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Image, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text("Photos", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
                     }
                 }
             }
@@ -126,81 +135,79 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryDetailDialog(entry: DiaryEntry, onDismiss: () -> Unit) {
-    var showMapDialog by remember { mutableStateOf(false) }
     var selectedImageIndex by remember { mutableIntStateOf(-1) }
+    var showMap by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val imageUrls = remember(entry.mediaPaths) {
+        try {
+            parseMediaPaths(entry.mediaPaths).filter { MediaUtils.isFileAccessible(it) }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Card(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.9f), shape = RoundedCornerShape(24.dp)) {
-            Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-                Row(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer).padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = onDismiss) { Text("Close", color = MaterialTheme.colorScheme.onPrimaryContainer) }
-                    Text(entry.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                    Spacer(Modifier.width(80.dp))
+        Card(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.9f).verticalScroll(rememberScrollState()),
+            shape = RoundedCornerShape(20.dp)) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(entry.title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
                 }
-                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        MoodBadge(mood = entry.mood)
-                        Text(formatTimestampFull(entry.timestamp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
-                    }
-                    if (entry.locationName != null && entry.latitude != null && entry.longitude != null) {
-                        Card(modifier = Modifier.fillMaxWidth().clickable { showMapDialog = true },
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)),
-                            shape = RoundedCornerShape(12.dp)) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.LocationOn, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                                        Spacer(Modifier.width(8.dp))
-                                        Text(entry.locationName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                                    }
-                                    TextButton(onClick = { showMapDialog = true }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)) {
-                                        Icon(Icons.Default.Map, null, modifier = Modifier.size(18.dp))
-                                        Spacer(Modifier.width(4.dp))
-                                        Text("Map", fontSize = 13.sp)
-                                    }
-                                }
-                                Text("Lat: " + "%.4f".format(entry.latitude) + ", Lng: " + "%.4f".format(entry.longitude),
-                                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.padding(top = 4.dp))
+                Spacer(Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    MoodBadge(mood = entry.mood)
+                    Text(TimeUtils.formatTime(entry.timestamp), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
+                }
+                Spacer(Modifier.height(20.dp))
+                Text(entry.content, style = MaterialTheme.typography.bodyLarge)
+                if (imageUrls.isNotEmpty()) {
+                    Spacer(Modifier.height(20.dp))
+                    Text("Photos", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(12.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        items(imageUrls.size) { index ->
+                            Card(modifier = Modifier.size(120.dp, 120.dp).clickable { selectedImageIndex = index },
+                                shape = RoundedCornerShape(12.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
+                                Image(painter = rememberAsyncImagePainter(
+                                    ImageRequest.Builder(LocalContext.current).data(MediaUtils.pathToLoadableUri(imageUrls[index])).crossfade(true).build()),
+                                    contentDescription = "Photo", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                             }
                         }
                     }
-                    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
-                        Text(entry.content, modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge)
-                    }
-                    if (!entry.mediaPaths.isNullOrBlank()) {
-                        try {
-                            val imageUrls = parseMediaPaths(entry.mediaPaths).filter { MediaUtils.isFileAccessible(it) }
-                            if (imageUrls.isNotEmpty()) {
-                                Text("Photos", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    items(imageUrls.size) { index ->
-                                        Card(modifier = Modifier.size(100.dp).clickable { selectedImageIndex = index },
-                                            shape = RoundedCornerShape(12.dp), elevation = CardDefaults.cardElevation(2.dp)) {
-                                            Image(painter = rememberAsyncImagePainter(ImageRequest.Builder(LocalContext.current)
-                                                .data(MediaUtils.pathToLoadableUri(imageUrls[index])).crossfade(true).build()),
-                                                contentDescription = "Photo " + (index + 1), modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                                        }
-                                    }
-                                }
+                }
+                if (entry.latitude != null && entry.longitude != null) {
+                    Spacer(Modifier.height(16.dp))
+                    Card(modifier = Modifier.fillMaxWidth().clickable { showMap = true }.height(200.dp),
+                        shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Default.LocationOn, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
+                                Spacer(Modifier.height(8.dp))
+                                Text(entry.locationName ?: "View Location", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                                Text("Tap to open map", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
                             }
-                        } catch (_: Exception) {}
+                        }
                     }
                 }
             }
         }
     }
-    if (showMapDialog) {
-        LocationMapDialog(latitude = entry.latitude ?: 0.0, longitude = entry.longitude ?: 0.0,
-            locationName = entry.locationName ?: "Unknown", onDismiss = { showMapDialog = false })
-    }
     if (selectedImageIndex >= 0) {
         try {
-            val urls = parseMediaPaths(entry.mediaPaths).filter { MediaUtils.isFileAccessible(it) }
-            if (selectedImageIndex < urls.size) { ImagePreviewDialog(imageUrl = urls[selectedImageIndex], onDismiss = { selectedImageIndex = -1 }) }
-        } catch (_: Exception) { selectedImageIndex = -1 }
+            if (selectedImageIndex < imageUrls.size) {
+                ImagePreviewDialog(imageUrl = imageUrls[selectedImageIndex], onDismiss = { selectedImageIndex = -1 })
+            }
+        } catch (_: Exception) {
+            selectedImageIndex = -1
+        }
+    }
+    if (showMap && entry.latitude != null && entry.longitude != null) {
+        LocationMapDialog(latitude = entry.latitude, longitude = entry.longitude,
+            locationName = entry.locationName ?: "Location", onDismiss = { showMap = false })
     }
 }
 
@@ -226,7 +233,7 @@ fun LocationMapDialog(latitude: Double, longitude: Double, locationName: String,
                         settings.builtInZoomControls = true
                         settings.displayZoomControls = false
                         webViewClient = WebViewClient()
-                        loadUrl("https://www.openstreetmap.org/?mlat=" + latitude + "&mlon=" + longitude + "#map=15/" + latitude + "/" + longitude)
+                        loadUrl("https://www.openstreetmap.org/?mlat=$latitude&mlon=$longitude#map=15/$latitude/$longitude")
                     }
                 }, modifier = Modifier.fillMaxSize())
             }
@@ -242,21 +249,27 @@ fun ImagePreviewDialog(imageUrl: String, onDismiss: () -> Unit) {
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), horizontalArrangement = Arrangement.End) {
                     IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
                 }
-                Image(painter = rememberAsyncImagePainter(ImageRequest.Builder(LocalContext.current)
-                    .data(MediaUtils.pathToLoadableUri(imageUrl)).crossfade(true).build()),
-                    contentDescription = "Preview", modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp), contentScale = ContentScale.Fit)
+                Image(painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(MediaUtils.pathToLoadableUri(imageUrl))
+                        .crossfade(true)
+                        .build()),
+                    contentDescription = "Preview",
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
+                    contentScale = ContentScale.Fit)
             }
         }
     }
 }
 
-fun parseMediaPaths(mediaPaths: String): List<String> {
+fun parseMediaPaths(mediaPaths: String?): List<String> {
+    if (mediaPaths.isNullOrBlank()) return emptyList()
     return try {
         val gson = com.google.gson.Gson()
         val type = object : com.google.gson.reflect.TypeToken<List<String>>() {}.type
         gson.fromJson<List<String>>(mediaPaths, type) ?: emptyList()
     } catch (_: Exception) {
-        if (mediaPaths.isNotBlank() && !mediaPaths.startsWith("[")) listOf(mediaPaths) else emptyList()
+        if (mediaPaths.startsWith("[")) emptyList() else listOf(mediaPaths)
     }
 }
 
@@ -298,88 +311,52 @@ fun AddDiaryFullDialog(onDismiss: () -> Unit, onSave: (String, String, String, S
             Column(modifier = Modifier.fillMaxSize()) {
                 Row(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer).padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = onDismiss) { Text("Cancel", color = MaterialTheme.colorScheme.onPrimaryContainer) }
-                    Text("Write Diary", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                    TextButton(onClick = {
-                        if (title.isNotBlank() && content.isNotBlank()) {
-                            val location = if (locationName.isNotBlank()) Triple(locationName, latitude, longitude) else null
-                            val pathsJson = if (selectedImageUris.isNotEmpty()) MediaUtils.copyUrisToInternalStorage(context, selectedImageUris, "diary") else ""
-                            onSave(title, content, mood, weather, tags, location, pathsJson)
-                        }
-                    }, enabled = title.isNotBlank() && content.isNotBlank()) {
-                        Text("Save", fontWeight = FontWeight.Bold,
-                            color = if (title.isNotBlank() && content.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
-                    }
+                    Text("New Diary Entry", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
                 }
                 Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") },
-                        singleLine = true, modifier = Modifier.fillMaxWidth(),
-                        textStyle = LocalTextStyle.current.copy(fontSize = 18.sp, fontWeight = FontWeight.Medium), shape = RoundedCornerShape(12.dp))
-
-                    Column {
-                        Text("Mood", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(8.dp))
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(listOf(Pair("happy","\uD83D\uDE0A Happy"), Pair("sad","\uD83D\uDE22 Sad"),
-                                Pair("neutral","\uD83D\uDE10 Calm"), Pair("excited","\uD83E\uDD29 Excited"),
-                                Pair("anxious","\uD83D\uDE30 Anxious"), Pair("angry","\uD83D\uDE20 Angry"))) { (v, l) ->
-                                FilterChip(selected = mood == v, onClick = { mood = v }, label = { Text(l, fontSize = 13.sp) },
-                                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer))
+                    OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                    OutlinedTextField(value = content, onValueChange = { content = it }, label = { Text("Content") }, modifier = Modifier.fillMaxWidth().height(150.dp), maxLines = 8)
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Mood", style = MaterialTheme.typography.labelLarge)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf("happy" to "\uD83D\uDE0A", "neutral" to "\uD83D\uDE10", "sad" to "\uD83D\uDE22",
+                                "excited" to "\uD83E\uDD29", "anxious" to "\uD83D\uDE30", "angry" to "\uD83D\uDE20").forEach { (m, emoji) ->
+                                FilterChip(selected = mood == m, onClick = { mood = m }, label = { Text(emoji) }, modifier = Modifier.height(36.dp))
                             }
                         }
                     }
-
-                    Column {
-                        Text("Weather", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(8.dp))
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(listOf(Pair("sunny","\u2600\uFE0F Sunny"), Pair("cloudy","\u26C5 Cloudy"),
-                                Pair("rainy","\uD83C\uDF27\uFE0F Rainy"), Pair("snowy","\u2744\uFE0F Snowy"),
-                                Pair("stormy","\u26C8\uFE0F Stormy"), Pair("night","\uD83C\uDF19 Night"))) { (v, l) ->
-                                FilterChip(selected = weather == v, onClick = { weather = v }, label = { Text(l, fontSize = 13.sp) },
-                                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer))
-                            }
-                        }
+                    OutlinedTextField(value = tags, onValueChange = { tags = it }, label = { Text("Tags (comma separated)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                    OutlinedTextField(value = locationName, onValueChange = { locationName = it },
+                        label = { Text("Location Name") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+                        trailingIcon = { Icon(Icons.Default.LocationOn, null) })
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(value = if (latitude != 0.0) latitude.toString() else "", onValueChange = { latitude = it.toDoubleOrNull() ?: 0.0 },
+                            label = { Text("Latitude") }, modifier = Modifier.weight(1f), singleLine = true)
+                        OutlinedTextField(value = if (longitude != 0.0) longitude.toString() else "", onValueChange = { longitude = it.toDoubleOrNull() ?: 0.0 },
+                            label = { Text("Longitude") }, modifier = Modifier.weight(1f), singleLine = true)
                     }
-
-                    OutlinedTextField(value = content, onValueChange = { content = it }, label = { Text("What happened today...") },
-                        modifier = Modifier.fillMaxWidth().heightIn(160.dp), minLines = 8, maxLines = 20, shape = RoundedCornerShape(12.dp))
-
-                    OutlinedTextField(value = tags, onValueChange = { tags = it }, label = { Text("Tags (comma separated)") },
-                        singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
-                        leadingIcon = { Icon(Icons.Default.Tag, null) })
-
-                    OutlinedTextField(value = locationName, onValueChange = { locationName = it }, label = { Text("Location (optional)") },
-                        placeholder = { Text("e.g., Central Park") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp), leadingIcon = { Icon(Icons.Default.LocationOn, null) })
-
-                    Column {
-                        Text("Add Photos", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            FilledTonalButton(onClick = { imagePicker.launch("image/*") }, shape = RoundedCornerShape(12.dp)) {
-                                Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text("From Album")
-                            }
+                    Card(modifier = Modifier.fillMaxWidth().clickable { imagePicker.launch("image/*") },
+                        shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+                        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.AddPhotoAlternate, null, Modifier.size(32.dp), tint = MaterialTheme.colorScheme.secondary)
+                            Spacer(Modifier.height(8.dp))
+                            Text("Add Photos", style = MaterialTheme.typography.labelLarge)
                             if (selectedImageUris.isNotEmpty()) {
-                                Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primaryContainer) {
-                                    Text("Selected " + selectedImageUris.size + " photos", modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                        style = MaterialTheme.typography.labelSmall)
-                                }
+                                Spacer(Modifier.height(8.dp))
+                                Text("${selectedImageUris.size} selected", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
                             }
                         }
-                        if (selectedImageUris.isNotEmpty()) {
-                            LazyRow(modifier = Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                items(selectedImageUris.size) { idx ->
-                                    Card(modifier = Modifier.size(80.dp), shape = RoundedCornerShape(8.dp)) {
-                                        Image(painter = rememberAsyncImagePainter(ImageRequest.Builder(context)
-                                            .data(selectedImageUris[idx]).crossfade(true).build()),
-                                            contentDescription = "Selected " + (idx + 1), modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                                    }
-                                }
-                            }
-                        }
+                    }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedButton(modifier = Modifier.weight(1f), onClick = onDismiss) { Text("Cancel") }
+                        Button(modifier = Modifier.weight(1f), onClick = {
+                            val mediaPaths = MediaUtils.copyUrisToInternalStorage(context, selectedImageUris)
+                            val gson = com.google.gson.Gson()
+                            onSave(title, content, mood, weather, tags,
+                                if (locationName.isNotBlank()) Triple(locationName, latitude, longitude) else null,
+                                gson.toJson(mediaPaths))
+                        }) { Text("Save") }
                     }
                 }
             }

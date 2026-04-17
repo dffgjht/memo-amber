@@ -1,4 +1,4 @@
-﻿package com.deathdiary.utils
+package com.deathdiary.utils
 
 import android.content.Context
 import android.content.Intent
@@ -54,7 +54,7 @@ object WillSender {
         return results
     }
 
-    private suspend fun sendEmail(context: Context, will: Will, config: EmailConfig?): Boolean {
+    suspend fun sendEmail(context: Context, will: Will, config: EmailConfig?): Boolean {
         if (config == null) return sendEmailViaIntent(context, will)
         return try {
             withContext(Dispatchers.IO) {
@@ -104,7 +104,7 @@ object WillSender {
         }
     }
 
-    private suspend fun sendSms(context: Context, will: Will, config: SmsConfig?): Boolean {
+    suspend fun sendSms(context: Context, will: Will, config: SmsConfig?): Boolean {
         if (config == null || config.apiUrl.isBlank()) return sendSmsViaIntent(context, will)
         return try {
             withContext(Dispatchers.IO) {

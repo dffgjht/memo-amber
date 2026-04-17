@@ -19,13 +19,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.deathdiary.data.entities.Will
+import com.deathdiary.utils.WillSender
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WillScreen(onNavigateBack: () -> Unit) {
     var showAddDialog by remember { mutableStateOf(false) }
+    var showConfigDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var emailConfig by remember {
+        mutableStateOf<WillSender.EmailConfig?>(null)
+    }
+    var smsConfig by remember {
+        mutableStateOf<WillSender.SmsConfig?>(null)
+    }
 
     val wills = remember {
         mutableStateListOf(
@@ -53,6 +64,9 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showConfigDialog = true }) {
+                        Icon(Icons.Default.Settings, contentDescription = "设置发送服务")
+                    }
                     IconButton(onClick = { showAddDialog = true }) {
                         Icon(Icons.Default.Add, contentDescription = "添加遗嘱")
                     }
@@ -115,6 +129,43 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                 }
             }
 
+            item {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showConfigDialog = true }
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "发送服务配置",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = buildString {
+                                    if (emailConfig != null) append("✓ 邮箱 ")
+                                    if (smsConfig != null) append("✓ 短信 ")
+                                    if (emailConfig == null && smsConfig == null) append("未配置")
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(Icons.Default.ChevronRight, null)
+                    }
+                }
+            }
+
             if (wills.isEmpty()) {
                 item {
                     Box(
@@ -141,7 +192,24 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                 }
             } else {
                 items(wills) { will ->
-                    WillCard(will = will)
+                    WillCard(
+                        will = will,
+                        onSendNow = {
+                            scope.launch {
+                                val success = when (will.contactType) {
+                                    "email" -> WillSender.sendEmail(context, will, emailConfig)
+                                    "sms" -> WillSender.sendSms(context, will, smsConfig)
+                                    else -> false
+                                }
+                                if (success) {
+                                    val idx = wills.indexOf(will)
+                                    if (idx >= 0) {
+                                        wills[idx] = will.copy(isReleased = true)
+                                    }
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -153,7 +221,7 @@ fun WillScreen(onNavigateBack: () -> Unit) {
             onSave = { title, content, recipientName, recipientContact, contactType, releaseCondition, releaseDate ->
                 wills.add(
                     Will(
-                        id = (wills.size + 1).toLong(),
+                        id = System.currentTimeMillis(),
                         title = title,
                         content = content,
                         recipientName = recipientName,
@@ -168,10 +236,23 @@ fun WillScreen(onNavigateBack: () -> Unit) {
             }
         )
     }
+
+    if (showConfigDialog) {
+        WillSenderConfigDialog(
+            emailConfig = emailConfig,
+            smsConfig = smsConfig,
+            onDismiss = { showConfigDialog = false },
+            onSave = { newEmailConfig, newSmsConfig ->
+                emailConfig = newEmailConfig
+                smsConfig = newSmsConfig
+                showConfigDialog = false
+            }
+        )
+    }
 }
 
 @Composable
-fun WillCard(will: Will) {
+fun WillCard(will: Will, onSendNow: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -250,27 +331,21 @@ fun WillCard(will: Will) {
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    if (will.recipientContact.isNotBlank()) {
-                        Text(
-                            text = "   ${will.recipientContact}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
+                    Text(
+                        text = will.recipientContact,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
                 }
-                if (will.releaseDate != null) {
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = "📅 计划发布",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                        Text(
-                            text = formatDateTimeFull(will.releaseDate),
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                if (!will.isReleased) {
+                    Button(
+                        onClick = onSendNow,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        Text("立即发送", style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -280,41 +355,25 @@ fun WillCard(will: Will) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddWillFullDialog(
+fun WillSenderConfigDialog(
+    emailConfig: WillSender.EmailConfig?,
+    smsConfig: WillSender.SmsConfig?,
     onDismiss: () -> Unit,
-    onSave: (String, String, String, String, String, String, Long?) -> Unit
+    onSave: (WillSender.EmailConfig?, WillSender.SmsConfig?) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
-    var recipientName by remember { mutableStateOf("") }
-    var recipientContact by remember { mutableStateOf("") }
-    var contactType by remember { mutableStateOf("email") }
-    var releaseCondition by remember { mutableStateOf("date") }
-    var releaseDate by remember { mutableStateOf<Long?>(null) }
+    var smtpHost by remember { mutableStateOf(emailConfig?.smtpHost ?: "smtp.gmail.com") }
+    var smtpPort by remember { mutableStateOf(emailConfig?.smtpPort?.toString() ?: "587") }
+    var emailUsername by remember { mutableStateOf(emailConfig?.username ?: "") }
+    var emailPassword by remember { mutableStateOf(emailConfig?.password ?: "") }
+    var senderEmail by remember { mutableStateOf(emailConfig?.senderEmail ?: "") }
 
-    // 日期时间选择器状态
-    var showDatePicker by remember { mutableStateOf(false) }
-    var showTimePicker by remember { mutableStateOf(false) }
-    var selectedYear by remember { mutableIntStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
-    var selectedMonth by remember { mutableIntStateOf(Calendar.getInstance().get(Calendar.MONTH)) }
-    var selectedDay by remember { mutableIntStateOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) }
-    var selectedHour by remember { mutableIntStateOf(12) }
-    var selectedMinute by remember { mutableIntStateOf(0) }
+    var smsApiUrl by remember { mutableStateOf(smsConfig?.apiUrl ?: "") }
+    var smsApiKey by remember { mutableStateOf(smsConfig?.apiKey ?: "") }
+    var smsSenderName by remember { mutableStateOf(smsConfig?.senderName ?: "") }
 
-    val context = LocalContext.current
-
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .fillMaxHeight(0.9f),
-            shape = RoundedCornerShape(24.dp)
-        ) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Card(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.85f), shape = RoundedCornerShape(24.dp)) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Header
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -323,30 +382,8 @@ fun AddWillFullDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("取消", color = MaterialTheme.colorScheme.onPrimaryContainer)
-                    }
-                    Text("创建遗嘱",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer)
-                    TextButton(
-                        onClick = {
-                            val date = if (releaseCondition == "date" && releaseDate != null) {
-                                releaseDate
-                            } else null
-                            onSave(title, content, recipientName, recipientContact, contactType, releaseCondition, date)
-                        },
-                        enabled = title.isNotBlank() && content.isNotBlank() &&
-                                recipientName.isNotBlank() && recipientContact.isNotBlank()
-                    ) {
-                        Text("保存",
-                            fontWeight = FontWeight.Bold,
-                            color = if (title.isNotBlank() && content.isNotBlank() &&
-                                    recipientName.isNotBlank() && recipientContact.isNotBlank())
-                                MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.outline)
-                    }
+                    Text("配置发送服务", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
                 }
 
                 Column(
@@ -354,373 +391,121 @@ fun AddWillFullDialog(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                         .padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        label = { Text("标题 *") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        leadingIcon = { Icon(Icons.Default.Title, contentDescription = null) }
+                    Text(
+                        "邮箱配置 (SMTP)",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
                     )
-
                     OutlinedTextField(
-                        value = content,
-                        onValueChange = { content = it },
-                        label = { Text("遗言内容 *") },
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
-                        minLines = 6,
-                        maxLines = 15,
-                        shape = RoundedCornerShape(12.dp)
+                        value = smtpHost,
+                        onValueChange = { smtpHost = it },
+                        label = { Text("SMTP 服务器") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = smtpPort,
+                            onValueChange = { smtpPort = it },
+                            label = { Text("端口") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = senderEmail,
+                            onValueChange = { senderEmail = it },
+                            label = { Text("发件人邮箱") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true
+                        )
+                    }
+                    OutlinedTextField(
+                        value = emailUsername,
+                        onValueChange = { emailUsername = it },
+                        label = { Text("用户名") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = emailPassword,
+                        onValueChange = { emailPassword = it },
+                        label = { Text("密码/应用专用密码") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
                     )
 
                     Divider()
 
-                    Text("收件人信息",
+                    Text(
+                        "短信配置",
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary)
-
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                     OutlinedTextField(
-                        value = recipientName,
-                        onValueChange = { recipientName = it },
-                        label = { Text("收件人姓名 *") },
-                        singleLine = true,
+                        value = smsApiUrl,
+                        onValueChange = { smsApiUrl = it },
+                        label = { Text("API URL (可选)") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) }
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = smsApiKey,
+                        onValueChange = { smsApiKey = it },
+                        label = { Text("API Key (可选)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = smsSenderName,
+                        onValueChange = { smsSenderName = it },
+                        label = { Text("发送者名称") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
                     )
 
-                    // 联系方式类型选择
-                    Column {
-                        Text("通知方式", style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(
-                                selected = contactType == "email",
-                                onClick = { contactType = "email" },
-                                label = { 
-                                    Row(verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text("📧")
-                                        Text("邮箱")
-                                    }
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer
-                                )
-                            )
-                            FilterChip(
-                                selected = contactType == "sms",
-                                onClick = { contactType = "sms" },
-                                label = { 
-                                    Row(verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text("📱")
-                                        Text("短信")
-                                    }
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
-                                )
-                            )
-                        }
-                    }
+                    Spacer(modifier = Modifier.weight(1f))
 
-                    OutlinedTextField(
-                        value = recipientContact,
-                        onValueChange = { 
-                            recipientContact = it
-                            // 自动检测类型
-                            if (it.matches(Regex("^1[3-9]\\d{9}$"))) {
-                                contactType = "sms"
-                            } else if (it.contains("@")) {
-                                contactType = "email"
-                            }
-                        },
-                        label = { 
-                            Text(
-                                if (contactType == "sms") "手机号码 *" 
-                                else "邮箱地址 *"
-                            )
-                        },
-                        placeholder = { 
-                            Text(
-                                if (contactType == "sms") "请输入手机号码" 
-                                else "请输入邮箱地址"
-                            )
-                        },
-                        singleLine = true,
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        leadingIcon = { 
-                            Icon(
-                                if (contactType == "sms") Icons.Default.Phone 
-                                else Icons.Default.Email, 
-                                contentDescription = null
-                            ) 
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedButton(modifier = Modifier.weight(1f), onClick = onDismiss) {
+                            Text("取消")
                         }
-                    )
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                val newEmailConfig = if (smtpHost.isNotBlank() && emailUsername.isNotBlank()) {
+                                    WillSender.EmailConfig(
+                                        smtpHost = smtpHost,
+                                        smtpPort = smtpPort.toIntOrNull() ?: 587,
+                                        username = emailUsername,
+                                        password = emailPassword,
+                                        senderEmail = senderEmail.ifBlank { emailUsername },
+                                        useSsl = true
+                                    )
+                                } else null
 
-                    // 配置提示
-                    if (contactType == "email") {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
-                            )
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    Icons.Default.Info,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Column {
-                                    Text(
-                                        "邮箱服务需要配置",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Medium
+                                val newSmsConfig = if (smsApiUrl.isNotBlank()) {
+                                    WillSender.SmsConfig(
+                                        apiUrl = smsApiUrl,
+                                        apiKey = smsApiKey,
+                                        senderName = smsSenderName
                                     )
-                                    Text(
-                                        "请在设置中配置SMTP服务器信息",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                                    )
-                                }
+                                } else null
+
+                                onSave(newEmailConfig, newSmsConfig)
                             }
-                        }
-                    } else {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                            )
                         ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    Icons.Default.Info,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Column {
-                                    Text(
-                                        "短信服务需要配置",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        "请在设置中配置短信服务API",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Divider()
-
-                    Text("发布条件",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary)
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(
-                            selected = releaseCondition == "date",
-                            onClick = { releaseCondition = "date" },
-                            label = { Text("指定日期") },
-                            leadingIcon = if (releaseCondition == "date") {
-                                { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                            } else null
-                        )
-                        FilterChip(
-                            selected = releaseCondition == "manual",
-                            onClick = { releaseCondition = "manual" },
-                            label = { Text("手动发布") },
-                            leadingIcon = if (releaseCondition == "manual") {
-                                { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                            } else null
-                        )
-                    }
-
-                    if (releaseCondition == "date") {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("选择发布日期和时间（精确到时分）",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                // 日期选择
-                                OutlinedButton(
-                                    onClick = { showDatePicker = true },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Icon(Icons.Default.CalendarToday, contentDescription = null,
-                                        modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        if (selectedYear > 0) "${selectedYear}年${selectedMonth + 1}月${selectedDay}日"
-                                        else "选择日期"
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // 时间选择
-                                OutlinedButton(
-                                    onClick = { showTimePicker = true },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Icon(Icons.Default.Schedule, contentDescription = null,
-                                        modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(String.format("%02d:%02d", selectedHour, selectedMinute))
-                                }
-
-                                if (releaseDate != null) {
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = MaterialTheme.colorScheme.primaryContainer
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Icon(Icons.Default.Schedule,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(16.dp),
-                                                tint = MaterialTheme.colorScheme.onPrimaryContainer)
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text(
-                                                text = formatDateTimeFull(releaseDate!!),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Medium,
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                                            )
-                                        }
-                                    }
-                                }
-                            }
+                            Text("保存配置")
                         }
                     }
                 }
             }
         }
-    }
-
-    // Date Picker Dialog
-    if (showDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = releaseDate ?: System.currentTimeMillis()
-        )
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val cal = Calendar.getInstance().apply { timeInMillis = millis }
-                        selectedYear = cal.get(Calendar.YEAR)
-                        selectedMonth = cal.get(Calendar.MONTH)
-                        selectedDay = cal.get(Calendar.DAY_OF_MONTH)
-                        // 更新 releaseDate
-                        val cal2 = Calendar.getInstance().apply {
-                            set(Calendar.YEAR, selectedYear)
-                            set(Calendar.MONTH, selectedMonth)
-                            set(Calendar.DAY_OF_MONTH, selectedDay)
-                            set(Calendar.HOUR_OF_DAY, selectedHour)
-                            set(Calendar.MINUTE, selectedMinute)
-                            set(Calendar.SECOND, 0)
-                        }
-                        releaseDate = cal2.timeInMillis
-                    }
-                    showDatePicker = false
-                }) {
-                    Text("确定")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("取消")
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-
-    // Time Picker Dialog
-    if (showTimePicker) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = selectedHour,
-            initialMinute = selectedMinute
-        )
-        AlertDialog(
-            onDismissRequest = { showTimePicker = false },
-            title = { Text("选择时间") },
-            text = {
-                TimePicker(state = timePickerState)
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    selectedHour = timePickerState.hour
-                    selectedMinute = timePickerState.minute
-                    // 更新 releaseDate
-                    if (releaseDate != null || releaseCondition == "date") {
-                        val base = releaseDate ?: System.currentTimeMillis()
-                        val cal = Calendar.getInstance().apply { timeInMillis = base }
-                        cal.set(Calendar.HOUR_OF_DAY, selectedHour)
-                        cal.set(Calendar.MINUTE, selectedMinute)
-                        cal.set(Calendar.SECOND, 0)
-                        releaseDate = cal.timeInMillis
-                    } else {
-                        val cal = Calendar.getInstance().apply {
-                            set(Calendar.YEAR, selectedYear)
-                            set(Calendar.MONTH, selectedMonth)
-                            set(Calendar.DAY_OF_MONTH, selectedDay)
-                            set(Calendar.HOUR_OF_DAY, selectedHour)
-                            set(Calendar.MINUTE, selectedMinute)
-                            set(Calendar.SECOND, 0)
-                        }
-                        releaseDate = cal.timeInMillis
-                    }
-                    showTimePicker = false
-                }) {
-                    Text("确定")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) {
-                    Text("取消")
-                }
-            }
-        )
     }
 }

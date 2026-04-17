@@ -1,4 +1,4 @@
-﻿package com.deathdiary.utils
+package com.deathdiary.utils
 
 import android.content.Context
 import android.net.Uri
@@ -12,9 +12,9 @@ object MediaUtils {
             if (!mediaDir.exists()) {
                 mediaDir.mkdirs()
             }
-            val fileName = "img__"
             val extension = getExtension(context, uri)
-            val destFile = File(mediaDir, ".")
+            val fileName = "img_${System.currentTimeMillis()}${(0..999).random()}.$extension"
+            val destFile = File(mediaDir, fileName)
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 destFile.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)

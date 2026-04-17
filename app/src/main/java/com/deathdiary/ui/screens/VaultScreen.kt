@@ -1,4 +1,4 @@
-﻿package com.deathdiary.ui.screens
+package com.deathdiary.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -176,7 +176,7 @@ fun AddVaultItemFullDialog(existingItem: VaultItem?, onDismiss: () -> Unit, onSa
                     TextButton(onClick = {
                         if (title.isNotBlank()) {
                             val savedItem = VaultItem(
-                                id = existingItem?.id ?: 0,
+                                id = if (existingItem != null && existingItem.id > 0) existingItem.id else System.currentTimeMillis(),
                                 title = title, category = category, content = content,
                                 username = username, password = password, url = url,
                                 timestamp = existingItem?.timestamp ?: System.currentTimeMillis()
@@ -198,38 +198,35 @@ fun AddVaultItemFullDialog(existingItem: VaultItem?, onDismiss: () -> Unit, onSa
                         Spacer(Modifier.height(8.dp))
                         androidx.compose.foundation.lazy.LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             items(categoryOptions) { (value, label) ->
-                                FilterChip(selected = category == value, onClick = { category = value }, label = { Text(label, fontSize = 13.sp) },
-                                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer))
+                                FilterChip(
+                                    selected = category == value,
+                                    onClick = { category = value },
+                                    label = { Text(label, style = MaterialTheme.typography.labelMedium) },
+                                    modifier = Modifier.height(36.dp)
+                                )
                             }
                         }
                     }
 
-                    OutlinedTextField(value = content, onValueChange = { content = it }, label = { Text("Description") },
-                        modifier = Modifier.fillMaxWidth(), minLines = 3, maxLines = 5, shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(value = content, onValueChange = { content = it },
+                        label = { Text("Content/Notes") }, modifier = Modifier.fillMaxWidth(),
+                        minLines = 3, maxLines = 5, shape = RoundedCornerShape(12.dp))
 
-                    OutlinedTextField(value = username, onValueChange = { username = it }, label = { Text("Username/Account") },
-                        singleLine = true, modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = { Icon(Icons.Default.Person, null) }, shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(value = username, onValueChange = { username = it },
+                        label = { Text("Username/Email") }, singleLine = true,
+                        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+                        leadingIcon = { Icon(Icons.Default.Person, null) })
 
-                    var passwordVisible by remember { mutableStateOf(false) }
-                    OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") },
-                        singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    OutlinedTextField(value = password, onValueChange = { password = it },
+                        label = { Text("Password") }, singleLine = true,
+                        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
                         leadingIcon = { Icon(Icons.Default.Lock, null) },
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    if (passwordVisible) "Hide" else "Show")
-                            }
-                        },
-                        visualTransformation = if (passwordVisible) androidx.compose.ui.text.input.VisualTransformation.None
-                            else androidx.compose.ui.text.input.PasswordVisualTransformation(),
-                        shape = RoundedCornerShape(12.dp))
+                        visualTransformation = if (password.isNotEmpty()) androidx.compose.ui.text.input.PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None)
 
-                    OutlinedTextField(value = url, onValueChange = { url = it }, label = { Text("URL (optional)") },
-                        singleLine = true, modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = { Icon(Icons.Default.Link, null) }, shape = RoundedCornerShape(12.dp))
-
-                    Spacer(Modifier.weight(1f))
+                    OutlinedTextField(value = url, onValueChange = { url = it },
+                        label = { Text("Website URL") }, singleLine = true,
+                        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+                        leadingIcon = { Icon(Icons.Default.Link, null) })
                 }
             }
         }
