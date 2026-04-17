@@ -1,8 +1,10 @@
 package com.deathdiary.ui.screens
 
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,11 +20,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.graphics.drawable.toBitmap
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.request.videoFrameMillis
 import com.deathdiary.data.entities.MediaItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,14 +39,14 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
     var showAddDialog by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("全部", "照片", "视频")
+    var selectedMedia by remember { mutableStateOf<MediaItem?>(null) }
+    var isPreviewLoading by remember { mutableStateOf(false) }
 
-    var mediaItems by remember {
-        mutableStateOf(
-            listOf(
-                MediaItem(id = 1, title = "全家福", description = "2025年春节合影", filePath = "", type = "image", timestamp = System.currentTimeMillis() - 15768000000L),
-                MediaItem(id = 2, title = "毕业典礼", description = "大学毕业那天", filePath = "", type = "image", timestamp = System.currentTimeMillis() - 31536000000L),
-                MediaItem(id = 3, title = "旅行记录", description = "海边日落", filePath = "", type = "video", timestamp = System.currentTimeMillis() - 5000000000L)
-            )
+    val mediaItems = remember {
+        mutableStateListOf(
+            MediaItem(id = 1, title = "全家福", description = "2025年春节合影", filePath = "", type = "image", timestamp = System.currentTimeMillis() - 15768000000L),
+            MediaItem(id = 2, title = "毕业典礼", description = "大学毕业那天", filePath = "", type = "image", timestamp = System.currentTimeMillis() - 31536000000L),
+            MediaItem(id = 3, title = "旅行记录", description = "海边日落", filePath = "", type = "video", timestamp = System.currentTimeMillis() - 5000000000L)
         )
     }
 
@@ -61,7 +69,7 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
                 type = "image",
                 timestamp = System.currentTimeMillis()
             )
-            mediaItems = mediaItems + newItem
+            mediaItems.add(newItem)
         }
     }
 
@@ -77,7 +85,7 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
                 type = "video",
                 timestamp = System.currentTimeMillis()
             )
-            mediaItems = mediaItems + newItem
+            mediaItems.add(newItem)
         }
     }
 
@@ -157,11 +165,19 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredItems) { item ->
-                        MediaGridItem(item = item)
+                        MediaGridItem(item = item, onClick = { selectedMedia = item })
                     }
                 }
             }
         }
+    }
+
+    // 图片/视频预览对话框
+    selectedMedia?.let { media ->
+        MediaPreviewDialog(
+            media = media,
+            onDismiss = { selectedMedia = null }
+        )
     }
 
     if (showAddDialog) {
@@ -180,7 +196,8 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
 }
 
 @Composable
-fun MediaGridItem(item: MediaItem) {
+fun MediaGridItem(item: MediaItem, onClick: () -> Unit = {}) {
+    val context = LocalContext.current
     val typeColor = when (item.type) {
         "video" -> Color(0xFFE74C3C)
         "audio" -> Color(0xFF3498DB)
@@ -191,7 +208,7 @@ fun MediaGridItem(item: MediaItem) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = { /* TODO: 打开详情 */ }
+        onClick = onClick
     ) {
         Column {
             // 媒体预览区
@@ -203,20 +220,46 @@ fun MediaGridItem(item: MediaItem) {
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                if (item.type == "video") {
-                    Icon(
-                        imageVector = Icons.Default.PlayCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = typeColor
-                    )
+                if (item.filePath.isNotBlank()) {
+                    val uri = Uri.parse(item.filePath)
+                    if (item.type == "video") {
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(uri)
+                                .videoFrameMillis(1000)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = item.title,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(uri)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = item.title,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 } else {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.outline
-                    )
+                    if (item.type == "video") {
+                        Icon(
+                            imageVector = Icons.Default.PlayCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = typeColor
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Image,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                    }
                 }
 
                 // 类型标签
@@ -394,6 +437,115 @@ fun AddMediaDialog(
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text("取消")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MediaPreviewDialog(
+    media: MediaItem,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .fillMaxHeight(0.85f),
+            shape = RoundedCornerShape(24.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = media.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        if (media.description.isNotBlank()) {
+                            Text(
+                                text = media.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "关闭",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+
+                // 媒体预览
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (media.filePath.isNotBlank()) {
+                        val uri = Uri.parse(media.filePath)
+                        if (media.type == "video") {
+                            // 视频预览 - 使用图标代替（实际播放需要 VideoView 或 ExoPlayer）
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Default.PlayCircle,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(80.dp),
+                                    tint = Color.White
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "点击播放视频",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White.copy(alpha = 0.7f)
+                                )
+                            }
+                        } else {
+                            AsyncImage(
+                                model = ImageRequest.Builder(context)
+                                    .data(uri)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = media.title,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = if (media.type == "video") Icons.Default.Videocam else Icons.Default.Image,
+                                contentDescription = null,
+                                modifier = Modifier.size(80.dp),
+                                tint = Color.White.copy(alpha = 0.5f)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "暂无预览",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White.copy(alpha = 0.5f)
+                            )
+                        }
+                    }
                 }
             }
         }
