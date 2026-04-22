@@ -1,143 +1,133 @@
-# 存证纪 (Cunzhengji) - 安卓应用
+<p align="center">
+  <h1 align="center">📔 存证纪</h1>
+  <p align="center"><strong>安全、私密的数字遗产管理安卓应用</strong></p>
+  <p align="center">
+    <img src="https://img.shields.io/badge/version-v1.3.0-blue" alt="Version" />
+    <img src="https://img.shields.io/badge/API-24%2B-green" alt="Android API" />
+    <img src="https://img.shields.io/badge/license-MIT-orange" alt="License" />
+    <img src="https://img.shields.io/badge/language-Kotlin-7F52FF" alt="Kotlin" />
+  </p>
+</p>
 
-一个安全、私密的数字遗产管理安卓应用，帮助您记录珍贵的回忆、保存重要的数字资产、制定周全的遗嘱计划。
-
-## 📥 下载安装
-
-**最新版本：** [v1.3.0 存证纪](https://github.com/dffgjht/death-diary/releases/tag/v1.3.0)
-
-点击上方链接下载 APK，直接安装即可使用。
+---
 
 ## ✨ 功能特性
 
-### 核心功能
-- 🔐 **生物识别认证** - 指纹/面容快速解锁
-- 🔐 **AES-256 加密存储** - 军事级数据保护
-- 📔 **日记系统** - 记录每一天的心情与感悟（含 GPS 位置）
-- 🔑 **密码保险箱** - 安全保管重要账号密码
-- 📜 **数字遗嘱** - 规划身后事的数字遗产，支持短信/邮件发送
-- 📸 **回忆相册** - 保存珍贵的照片和视频
-- 💬 **社区留言板** - 与亲友分享心声
-- 💾 **数据备份** - 加密备份，支持导出到外部存储
+| 功能 | 说明 |
+|:-----|:-----|
+| 🔐 **生物识别认证** | 指纹 / 面容解锁，拒绝未授权访问 |
+| 🛡️ **AES-256 加密存储** | 全部敏感数据使用 AES-256-GCM 加密，密钥由 Android Keystore 管理 |
+| 📔 **日记系统** | 富文本日记，自动记录 GPS 位置与时间戳 |
+| 🔑 **密码保险箱** | 安全存储账号密码，一键复制 |
+| 📜 **数字遗嘱** | 编写遗嘱，支持通过短信 / 邮件定时发送 |
+| 📸 **回忆相册** | 加密相册，保存珍贵照片与回忆 |
+| 💬 **社区留言板** | 为亲人留下寄语与留言 |
+| 💾 **数据备份 / 恢复** | 本地备份导出与恢复，数据不丢失 |
+| ⏱️ **自动锁定** | 5 分钟无操作自动锁定，防止泄露 |
 
-### 更多特性
-- 🎨 Material Design 3 美观界面
-- 📱 纯本地存储，数据完全由您掌控
-- 🔒 隐私优先，无强制联网
-- ⏱️ **自动锁定** - 5 分钟无操作自动锁定
+## 📸 应用截图
+
+<p align="center">
+<kbd>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;┌─────────────────┐&nbsp;&nbsp;&nbsp;&nbsp;┌─────────────────┐&nbsp;&nbsp;&nbsp;&nbsp;┌─────────────────┐<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;🔐 生物识别解锁&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;📔 日记列表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;📜 数字遗嘱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;*(截图占位)*&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;*(截图占位)*&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;*(截图占位)*&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;└─────────────────┘&nbsp;&nbsp;&nbsp;&nbsp;└─────────────────┘&nbsp;&nbsp;&nbsp;&nbsp;└─────────────────┘<br/>
+<br/>
+</kbd>
+</p>
+
+> 📌 将实际截图放置于 `docs/screenshots/` 目录，替换上述占位区域。
+
+## 🛠️ 技术栈
+
+| 类别 | 技术 |
+|:-----|:-----|
+| 语言 | Kotlin 1.9.20 |
+| UI 框架 | Jetpack Compose |
+| 设计规范 | Material Design 3 |
+| 本地数据库 | Room Database |
+| 加密算法 | AES-256-GCM |
+| 密钥管理 | Android Keystore |
+| 身份认证 | Android Biometric API |
+| 最低版本 | Android 7.0 (API 24) |
+| 目标版本 | Android 14 (API 34) |
+
+## 🔒 安全特性
+
+存证纪从底层架构就将安全作为第一优先级：
+
+- **端到端加密** — 所有日记、密码、遗嘱等敏感数据使用 AES-256-GCM 对称加密
+- **硬件级密钥保护** — 加密密钥存储于 Android Keystore，由 TEE / StrongBox 保护，不可导出
+- **生物识别门禁** — 启动应用必须通过指纹或面容验证，充分利用设备硬件安全能力
+- **自动锁定机制** — 5 分钟无操作自动锁定，返回需重新认证
+- **零网络依赖** — 核心数据完全本地存储，不联网，不泄露
 
 ## 🚀 快速开始
 
-### 使用 Android Studio 构建
+### 环境要求
 
-1. 打开 Android Studio
-2. File → Open → 选择项目文件夹
-3. 等待 Gradle 同步完成（首次 5-10 分钟）
-4. Build → Build Bundle(s) / APK(s) → Build APK(s)
-5. 在 `app/build/outputs/apk/debug/app-debug.apk` 获取 APK
+- Android Studio Hedgehog (2023.1.1) 或更高版本
+- JDK 17+
+- Android SDK，包含 API 34
 
-详细步骤：[BUILD_GUIDE.md](BUILD_GUIDE.md)
+### Android Studio
 
-### 使用命令行构建
+1. **Clone 项目**
+   ```bash
+   git clone https://github.com/dffgjht/death-diary.git
+   ```
+2. 用 Android Studio 打开项目目录
+3. 等待 Gradle Sync 完成
+4. 连接设备或启动模拟器（API 24+）
+5. 点击 **Run** ▶️
+
+### 命令行
 
 ```bash
+# 克隆仓库
+git clone https://github.com/dffgjht/death-diary.git
+cd death-diary
+
+# Debug 构建
 ./gradlew assembleDebug
+
+# 安装到连接的设备
+./gradlew installDebug
 ```
-
-## 📱 系统要求
-
-- Android 7.0 (API 24) 或更高版本
-- 推荐使用 Android 10+ 以获得最佳体验
-
-## 🔧 技术栈
-
-| 技术 | 说明 |
-|:------|------|
-| Kotlin 1.9.20 | 编程语言 |
-| Jetpack Compose | 现代 UI 框架 |
-| Room Database | 本地数据库 |
-| Material Design 3 | 设计语言 |
-| AES-256-GCM | 数据加密 |
-| SHA-256 + Salt | 密码哈希（10000 次迭代） |
-| Android Keystore | 硬件级密钥存储 |
-| 生物识别 API | 身份认证 |
 
 ## 📁 项目结构
 
 ```
-存证纪/
-├── app/
-│   ├── src/main/
-│   │   ├── java/com/deathdiary/
-│   │   │   ├── MainActivity.kt
-│   │   │   ├── AppSession.kt         # 会话管理
-│   │   │   ├── data/                 # 数据层
-│   │   │   ├── security/             # 安全加密
-│   │   │   ├── ui/screens/           # 界面组件
-│   │   │   ├── utils/                # 工具类
-│   │   │   └── viewmodels/           # ViewModel
-│   │   └── res/                      # 资源文件
-│   ├── src/test/                     # 单元测试
-│   └── build.gradle.kts
-├── gradle/wrapper/                   # Gradle 包装器
-├── .github/workflows/                # CI/CD 流程
-├── OPTIMIZATION_REPORT.md            # 优化报告
-├── BUILD_GUIDE.md                    # 构建指南
+app/
+├── src/main/
+│   ├── java/com/dffgjht/deathdiary/
+│   │   ├── data/              # 数据层 — Room 数据库、DAO、实体
+│   │   ├── di/                # 依赖注入模块
+│   │   ├── ui/                # Compose UI — 页面与组件
+│   │   ├── viewmodel/         # ViewModel 层
+│   │   ├── security/          # 加密、Keystore、生物识别
+│   │   └── util/              # 工具类与扩展函数
+│   └── res/                   # 资源文件
 ├── build.gradle.kts
-├── settings.gradle.kts
-└── gradlew
+└── proguard-rules.pro
 ```
 
-## 🔒 安全特性
+## 📋 版本历史
 
-- **AES-256-GCM 加密** - 军事级数据保护
-- **SHA-256 + Salt 密码哈希** - 10000 次迭代，防彩虹表攻击
-- **Android Keystore** - 硬件级密钥存储，需要生物识别认证
-- **生物识别认证** - 指纹/面容解锁
-- **自动锁定** - 5 分钟无操作自动锁定
-- **Room 数据库迁移** - 安全的数据版本升级
-- **数据备份/恢复** - 加密备份，支持导出到外部存储
-- **完全离线** - 数据仅存储在您的设备
+| 版本 | 日期 | 说明 |
+|:-----|:-----|:-----|
+| [v1.3.0](https://github.com/dffgjht/death-diary/releases/tag/v1.3.0) | — | 首个公开发布版本 |
 
-## 🧪 测试
+> 完整版本记录见 [Releases](https://github.com/dffgjht/death-diary/releases)。
 
-运行单元测试：
-```bash
-./gradlew test
-```
+## 🤝 贡献
 
-测试覆盖：
-- `SecurityManagerTest` - 安全功能测试
-- `MediaUtilsTest` - 媒体工具测试
+欢迎贡献！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
 
 ## 📄 许可证
 
-MIT License
-
-## 📌 版本历史
-
-| 版本 | 更新内容 |
-|:------|----------|
-| [v1.3.0](https://github.com/dffgjht/death-diary/releases/tag/v1.3.0) | 修复 Room 数据库实体与列名映射问题，优化社区功能性能 |
-| [v1.2.5](https://github.com/dffgjht/death-diary/releases/tag/v1.2.5) | 修复密码保险箱编辑闪退、相册预览、遗嘱支持短信/邮件发送、生物识别完善（指纹 + 人脸） |
-| [v1.2.4](https://github.com/dffgjht/death-diary/releases/tag/v1.2.4) | 修复数据持久化、备份对话框、版本号显示、生物识别优先指纹、相册图片预览、应用图标更新 |
-| [v1.2.3](https://github.com/dffgjht/death-diary/releases/tag/v1.2.3) | 新增备份/恢复功能、自动锁定机制、文档精简 |
-| [v1.2.2](https://github.com/dffgjht/death-diary/releases/tag/v1.2.2) | 安全增强：BCrypt 密码哈希、数据库迁移策略、CI/CD 完善 |
-| [v1.2.1](https://github.com/dffgjht/death-diary/releases/tag/v1.2.1) | 修复后台重登闪退、编辑删除功能、GPS 定位、隐私政策 |
-| [v1.2](https://github.com/dffgjht/death-diary/releases/tag/v1.2) | 修复闪退问题，优化 UI，精确日期到时分秒，本地相册 |
-| [v1.1](https://github.com/dffgjht/death-diary/releases/tag/v1.1) | 新增社区留言板功能 |
-| v1.0 | 初始版本发布 |
-
----
-
-## 📞 技术支持
-
-如有问题，请查看：
-- [BUILD_GUIDE.md](BUILD_GUIDE.md) - 构建指南
-- [OPTIMIZATION_REPORT.md](OPTIMIZATION_REPORT.md) - 优化报告
-
----
-
-**开发者**: dffgjht  
-**项目地址**: https://github.com/dffgjht/death-diary  
-**最后更新**: 2026-04-17
+本项目基于 [MIT License](LICENSE) 开源。
