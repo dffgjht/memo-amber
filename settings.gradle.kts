@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DeathDiary"
+rootProject.name = "MemoAmber"
 include(":app")

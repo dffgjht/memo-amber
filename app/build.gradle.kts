@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.deathdiary"
+    namespace = "com.memoamber"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.deathdiary"
+        applicationId = "com.memoamber"
         minSdk = 24
         targetSdk = 34
         versionCode = 5

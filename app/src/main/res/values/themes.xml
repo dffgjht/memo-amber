@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base application theme for Compose apps -->
-    <style name="Theme.DeathDiary" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.MemoAmber" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">#FF000000</item>
         <item name="android:navigationBarColor">#FF000000</item>
         <item name="android:windowBackground">#FF000000</item>

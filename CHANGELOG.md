@@ -5,6 +5,14 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [1.3.1] - 2026-04-27
+
+### Changed
+- 项目更名为「记忆琥珀 MemoAmber」（原 death-diary / 存证纪）
+- 包名由 com.deathdiary 更名为 com.memoamber
+- 主题由 Theme.DeathDiary 更名为 Theme.MemoAmber
+- README 新增命名寓意章节
+
 ## [1.3.0] - 2026-04-17
 
 ### Fixed
@@ -89,12 +97,13 @@
 - 数字遗嘱
 - 回忆相册
 
-[1.3.0]: https://github.com/dffgjht/death-diary/releases/tag/v1.3.0
-[1.2.5]: https://github.com/dffgjht/death-diary/releases/tag/v1.2.5
-[1.2.4]: https://github.com/dffgjht/death-diary/releases/tag/v1.2.4
-[1.2.3]: https://github.com/dffgjht/death-diary/releases/tag/v1.2.3
-[1.2.2]: https://github.com/dffgjht/death-diary/releases/tag/v1.2.2
-[1.2.1]: https://github.com/dffgjht/death-diary/releases/tag/v1.2.1
-[1.2]: https://github.com/dffgjht/death-diary/releases/tag/v1.2
-[1.1]: https://github.com/dffgjht/death-diary/releases/tag/v1.1
-[1.0]: https://github.com/dffgjht/death-diary/releases/tag/v1.0
+[1.3.1]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.1
+[1.3.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0
+[1.2.5]: https://github.com/dffgjht/memo-amber/releases/tag/v1.2.5
+[1.2.4]: https://github.com/dffgjht/memo-amber/releases/tag/v1.2.4
+[1.2.3]: https://github.com/dffgjht/memo-amber/releases/tag/v1.2.3
+[1.2.2]: https://github.com/dffgjht/memo-amber/releases/tag/v1.2.2
+[1.2.1]: https://github.com/dffgjht/memo-amber/releases/tag/v1.2.1
+[1.2]: https://github.com/dffgjht/memo-amber/releases/tag/v1.2
+[1.1]: https://github.com/dffgjht/memo-amber/releases/tag/v1.1
+[1.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.0

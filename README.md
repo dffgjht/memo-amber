@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">📔 存证纪</h1>
+  <h1 align="center">🪵 记忆琥珀</h1>
   <p align="center"><strong>安全、私密的数字遗产管理安卓应用</strong></p>
   <p align="center">
     <img src="https://img.shields.io/badge/version-v1.3.0-blue" alt="Version" />
@@ -8,6 +8,18 @@
     <img src="https://img.shields.io/badge/language-Kotlin-7F52FF" alt="Kotlin" />
   </p>
 </p>
+
+---
+
+## 📛 命名寓意
+
+> **琥珀**（Amber）—— 大自然最古老的记忆守护者。
+>
+> 数千万年前，一滴树脂不经意间包裹住一片落叶、一只振翅的昆虫，在漫长岁月中悄然凝固，将那个瞬间完好无损地封存至今。
+>
+> **记忆琥珀** 做的正是同样的事：用 AES-256 加密和 Android Keystore 硬件级密钥保护，将你的日记、遗嘱、密码和珍贵照片安全地封存在手机里。不联网，不上传，不泄露 —— 就像琥珀中的生命，被永久而私密地守护着。
+>
+> 每一条记录，都是凝固在时间里的琥珀。🪵✨
 
 ---
 
@@ -58,7 +70,7 @@
 
 ## 🔒 安全特性
 
-存证纪从底层架构就将安全作为第一优先级：
+记忆琥珀从底层架构就将安全作为第一优先级：
 
 - **端到端加密** — 所有日记、密码、遗嘱等敏感数据使用 AES-256-GCM 对称加密
 - **硬件级密钥保护** — 加密密钥存储于 Android Keystore，由 TEE / StrongBox 保护，不可导出
@@ -78,7 +90,7 @@
 
 1. **Clone 项目**
    ```bash
-   git clone https://github.com/dffgjht/death-diary.git
+   git clone https://github.com/dffgjht/memo-amber.git
    ```
 2. 用 Android Studio 打开项目目录
 3. 等待 Gradle Sync 完成
@@ -89,8 +101,8 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/dffgjht/death-diary.git
-cd death-diary
+git clone https://github.com/dffgjht/memo-amber.git
+cd memo-amber
 
 # Debug 构建
 ./gradlew assembleDebug
@@ -104,7 +116,7 @@ cd death-diary
 ```
 app/
 ├── src/main/
-│   ├── java/com/dffgjht/deathdiary/
+│   ├── java/com/memoamber/
 │   │   ├── data/              # 数据层 — Room 数据库、DAO、实体
 │   │   ├── di/                # 依赖注入模块
 │   │   ├── ui/                # Compose UI — 页面与组件
@@ -120,9 +132,9 @@ app/
 
 | 版本 | 日期 | 说明 |
 |:-----|:-----|:-----|
-| [v1.3.0](https://github.com/dffgjht/death-diary/releases/tag/v1.3.0) | — | 首个公开发布版本 |
+| [v1.3.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0) | — | 首个公开发布版本 |
 
-> 完整版本记录见 [Releases](https://github.com/dffgjht/death-diary/releases)。
+> 完整版本记录见 [Releases](https://github.com/dffgjht/memo-amber/releases)。
 
 ## 🤝 贡献
 
