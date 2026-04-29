@@ -2,7 +2,7 @@
   <h1 align="center">🪵 记忆琥珀</h1>
   <p align="center"><strong>安全、私密的数字遗产管理安卓应用</strong></p>
   <p align="center">
-    <img src="https://img.shields.io/badge/version-v1.3.0-blue" alt="Version" />
+    <img src="https://img.shields.io/badge/version-v1.4.0-blue" alt="Version" />
     <img src="https://img.shields.io/badge/API-24%2B-green" alt="Android API" />
     <img src="https://img.shields.io/badge/license-MIT-orange" alt="License" />
     <img src="https://img.shields.io/badge/language-Kotlin-7F52FF" alt="Kotlin" />
@@ -97,7 +97,7 @@
 4. 连接设备或启动模拟器（API 24+）
 5. 点击 **Run** ▶️
 
-### 命令行
+### 命令行（Android）
 
 ```bash
 # 克隆仓库
@@ -110,6 +110,19 @@ cd memo-amber
 # 安装到连接的设备
 ./gradlew installDebug
 ```
+
+### 桌面端构建
+
+桌面端基于 Kotlin + Jetpack Compose for Desktop（Material3），支持 Windows / macOS / Linux。
+
+```bash
+# 构建 fat jar（包含所有依赖）
+./gradlew :desktop:fatJar
+
+# 输出位置：desktop/build/libs/desktop-1.4.0-all.jar
+```
+
+> ⚠️ **fat jar 签名说明**：`fatJar` 任务已配置排除 BouncyCastle 等库的签名文件（`.SF`/`.DSA`/`.RSA`/`.EC`），避免 `SecurityException: Invalid signature file digest` 错误。如果手动打包 fat jar，请确保排除这些文件。
 
 ## 📁 项目结构
 
@@ -132,6 +145,7 @@ app/
 
 | 版本 | 日期 | 说明 |
 |:-----|:-----|:-----|
+| [v1.4.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0) | 2026-04-30 | 修复桌面端打包签名冲突 |
 | [v1.3.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0) | — | 首个公开发布版本 |
 
 > 完整版本记录见 [Releases](https://github.com/dffgjht/memo-amber/releases)。

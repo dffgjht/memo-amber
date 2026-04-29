@@ -1,17 +1,17 @@
 # 贡献指南
 
-感谢你对 **存证纪（Death Diary）** 项目的关注！我们欢迎任何形式的贡献。
+感谢你对 **记忆琥珀（MemoAmber）** 项目的关注！我们欢迎任何形式的贡献。
 
 ## 快速开始
 
 ### 1. Fork 并克隆
 
 ```bash
-git clone https://github.com/<your-username>/death-diary.git
-cd death-diary
+git clone https://github.com/<your-username>/memo-amber.git
+cd memo-amber
 
 # 添加上游仓库
-git remote add upstream https://github.com/dffgjht/death-diary.git
+git remote add upstream https://github.com/dffgjht/memo-amber.git
 ```
 
 ### 2. 同步最新代码
@@ -165,7 +165,7 @@ fun UserProfileScreen() { }
 
 ### Bug 反馈
 
-使用 [GitHub Issues](https://github.com/dffgjht/death-diary/issues) 提交，包含：
+使用 [GitHub Issues](https://github.com/dffgjht/memo-amber/issues) 提交，包含：
 
 1. Bug 描述
 2. 复现步骤
@@ -179,4 +179,4 @@ fun UserProfileScreen() { }
 
 ---
 
-感谢你的贡献！每一次参与都让存证纪变得更好。🎉
+感谢你的贡献！每一次参与都让记忆琥珀变得更好。🎉

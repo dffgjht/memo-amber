@@ -5,6 +5,15 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [1.4.0] - 2026-04-30
+
+### Fixed
+- 修复桌面端 fat jar 签名冲突导致 exe 无法启动的问题（SecurityException: Invalid signature file digest）
+- 在 fatJar 构建任务中排除 META-INF 签名文件（.SF/.DSA/.RSA/.EC）
+
+### Changed
+- desktop/build.gradle.kts 优化 fat jar 打包流程
+
 ## [1.3.1] - 2026-04-27
 
 ### Changed
@@ -97,6 +106,7 @@
 - 数字遗嘱
 - 回忆相册
 
+[1.4.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0
 [1.3.1]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.1
 [1.3.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0
 [1.2.5]: https://github.com/dffgjht/memo-amber/releases/tag/v1.2.5
