@@ -1,0 +1,18 @@
+# Android
+.DS_Store
+.idea
+*.iml
+.gradle
+build/
+bin/
+local.properties
+
+# APK builds
+*.apk
+
+# Keystore files
+key.properties
+keystore.jks
+
+# Debug logs
+*test.log
