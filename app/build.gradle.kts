@@ -12,8 +12,8 @@ android {
         applicationId = "com.deathdiary"
         minSdk = 24
         targetSdk = 34
-        versionCode = 126
-        versionName = "1.2.6"
+        versionCode = 125
+        versionName = "1.2.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -98,18 +98,14 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     // Coil for image loading
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil:2.5.0")
 
-    // JavaMail for email sending
-    implementation("com.sun.mail:android-mail:1.6.7")
-    implementation("com.sun.mail:android-activation:1.6.7")
+    // Hilt Dependency Injection
+    val hiltVersion = "2.48"
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("com.google.dagger:hilt-android:" + hiltVersion)
+    kapt("com.google.dagger:hilt-compiler:" + hiltVersion)
 
-    // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    // Splash Screen
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
