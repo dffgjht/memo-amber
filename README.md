@@ -2,7 +2,7 @@
   <h1 align="center">🪵 记忆琥珀</h1>
   <p align="center"><strong>安全、私密的数字遗产管理安卓应用</strong></p>
   <p align="center">
-    <img src="https://img.shields.io/badge/version-v1.4.0-blue" alt="Version" />
+    <img src="https://img.shields.io/badge/version-v1.5.0-blue" alt="Version" />
     <img src="https://img.shields.io/badge/API-24%2B-green" alt="Android API" />
     <img src="https://img.shields.io/badge/license-MIT-orange" alt="License" />
     <img src="https://img.shields.io/badge/language-Kotlin-7F52FF" alt="Kotlin" />
@@ -29,30 +29,23 @@
 |:-----|:-----|
 | 🔐 **生物识别认证** | 指纹 / 面容解锁，拒绝未授权访问 |
 | 🛡️ **AES-256 加密存储** | 全部敏感数据使用 AES-256-GCM 加密，密钥由 Android Keystore 管理 |
-| 📔 **日记系统** | 富文本日记，自动记录 GPS 位置与时间戳 |
+| 📔 **日记系统** | 富文本日记，支持心情 / 天气 / 标签与照片，自动记录时间戳 |
+| ✏️ **日记编辑** | 随时修改或删除已有日记 |
 | 🔑 **密码保险箱** | 安全存储账号密码，一键复制 |
 | 📜 **数字遗嘱** | 编写遗嘱，支持通过短信 / 邮件定时发送 |
 | 📸 **回忆相册** | 加密相册，保存珍贵照片与回忆 |
 | 💬 **社区留言板** | 为亲人留下寄语与留言 |
 | 💾 **数据备份 / 恢复** | 本地备份导出与恢复，数据不丢失 |
-| ⏱️ **自动锁定** | 5 分钟无操作自动锁定，防止泄露 |
+| ⏱️ **自动锁定** | 离开应用 5 分钟自动锁定，防止泄露 |
+| 🖥️ **桌面端** | 基于 Compose for Desktop 的跨平台版本（Windows / macOS / Linux） |
 
 ## 📸 应用截图
 
 <p align="center">
-<kbd>
-<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;┌─────────────────┐&nbsp;&nbsp;&nbsp;&nbsp;┌─────────────────┐&nbsp;&nbsp;&nbsp;&nbsp;┌─────────────────┐<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;🔐 生物识别解锁&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;📔 日记列表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;📜 数字遗嘱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;*(截图占位)*&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;*(截图占位)*&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;*(截图占位)*&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;└─────────────────┘&nbsp;&nbsp;&nbsp;&nbsp;└─────────────────┘&nbsp;&nbsp;&nbsp;&nbsp;└─────────────────┘<br/>
-<br/>
-</kbd>
+  <img src="screenshot.png" alt="记忆琥珀主界面" width="360" />
 </p>
 
-> 📌 将实际截图放置于 `docs/screenshots/` 目录，替换上述占位区域。
+> 📌 更多截图可放置于 `docs/screenshots/` 目录后补充。
 
 ## 🛠️ 技术栈
 
@@ -104,7 +97,7 @@
 git clone https://github.com/dffgjht/memo-amber.git
 cd memo-amber
 
-# Debug 构建
+# Debug 构建（Windows 请使用 gradlew.bat）
 ./gradlew assembleDebug
 
 # 安装到连接的设备
@@ -119,7 +112,7 @@ cd memo-amber
 # 构建 fat jar（包含所有依赖）
 ./gradlew :desktop:fatJar
 
-# 输出位置：desktop/build/libs/desktop-1.4.0-all.jar
+# 输出位置：desktop/build/libs/desktop-1.5.0-all.jar
 ```
 
 > ⚠️ **fat jar 签名说明**：`fatJar` 任务已配置排除 BouncyCastle 等库的签名文件（`.SF`/`.DSA`/`.RSA`/`.EC`），避免 `SecurityException: Invalid signature file digest` 错误。如果手动打包 fat jar，请确保排除这些文件。
@@ -127,24 +120,32 @@ cd memo-amber
 ## 📁 项目结构
 
 ```
-app/
-├── src/main/
-│   ├── java/com/memoamber/
-│   │   ├── data/              # 数据层 — Room 数据库、DAO、实体
-│   │   ├── di/                # 依赖注入模块
-│   │   ├── ui/                # Compose UI — 页面与组件
-│   │   ├── viewmodel/         # ViewModel 层
-│   │   ├── security/          # 加密、Keystore、生物识别
-│   │   └── util/              # 工具类与扩展函数
-│   └── res/                   # 资源文件
+├── app/                        # Android 端
+│   └── src/main/
+│       ├── java/com/memoamber/
+│       │   ├── data/           # 数据层 — Room 数据库、DAO、实体
+│       │   ├── network/        # 网络层 — Retrofit 客户端与 API（社区功能）
+│       │   ├── security/       # 加密、Keystore、生物识别
+│       │   ├── ui/
+│       │   │   ├── screens/    # Compose 页面（日记/保险箱/遗嘱/相册/社区/设置）
+│       │   │   ├── theme/      # Material3 主题
+│       │   │   └── viewmodels/ # ViewModel 层
+│       │   └── utils/          # 工具类（备份恢复、媒体文件）
+│       └── res/                # 资源文件
+├── desktop/                    # 桌面端（Compose for Desktop，Kotlin JVM）
+│   └── src/main/kotlin/com/memoamber/desktop/
+│       ├── data/               # SQLite + Argon2id 加密存储
+│       └── ui/                 # Compose 桌面端 UI
 ├── build.gradle.kts
-└── proguard-rules.pro
+├── gradlew / gradlew.bat       # Gradle Wrapper（Windows / Unix）
+└── CHANGELOG.md
 ```
 
 ## 📋 版本历史
 
 | 版本 | 日期 | 说明 |
 |:-----|:-----|:-----|
+| [v1.5.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.5.0) | 2026-08-10 | 日记接入数据库、密码哈希升级 PBKDF2、包名统一为 com.memoamber |
 | [v1.4.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0) | 2026-04-30 | 修复桌面端打包签名冲突 |
 | [v1.3.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0) | — | 首个公开发布版本 |
 

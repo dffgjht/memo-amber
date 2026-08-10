@@ -5,6 +5,29 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [1.5.0] - 2026-08-10
+
+### Fixed
+- 修复 `WillDao.markAsReleased` 引用不存在的列名（`isReleased` → `is_released`）
+- 修复 `VaultItemDao` / `WillDao` / `MediaItemDao` 缺失的同步查询与更新方法，解决 VaultScreen / WillScreen / GalleryScreen 编译失败
+- 补充缺失的 `coil-compose`（相册图片加载）与 `androidx.documentfile`（备份恢复）依赖
+- 新增 `gradlew.bat`，Windows 用户可直接命令行构建
+
+### Added
+- 日记功能接入 Room 数据库：真实的新建 / 编辑 / 查看 / 删除，支持心情、天气、标签与照片
+- 设置页「修改主密码」功能（需验证旧密码）
+- 设置页「清除所有数据」实际生效（清空数据库并删除本地备份）
+- 自动锁定机制落地：离开应用超过 5 分钟回到前台需重新解锁
+- 设置项（生物识别开关、自动锁定开关）持久化
+
+### Changed
+- 版本统一为 1.5.0（Android / Desktop / README / 设置页显示）
+- 「存证纪」旧品牌文案全面统一为「记忆琥珀」
+- 社区帖子 / 评论外键列补充索引，避免全表扫描
+
+### Security
+- 主密码哈希由 `String.hashCode` 升级为 PBKDF2WithHmacSHA256 加盐哈希（12 万次迭代），兼容旧版哈希，老用户无需重新设置密码
+
 ## [1.4.0] - 2026-04-30
 
 ### Fixed
@@ -106,6 +129,7 @@
 - 数字遗嘱
 - 回忆相册
 
+[1.5.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.5.0
 [1.4.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0
 [1.3.1]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.1
 [1.3.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0
