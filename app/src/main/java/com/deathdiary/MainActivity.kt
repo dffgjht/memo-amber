@@ -14,7 +14,7 @@ import com.deathdiary.ui.screens.*
 import com.deathdiary.data.entities.CommunityPost
 import com.deathdiary.data.entities.CommunityComment
 import com.deathdiary.data.entities.User
-import com.deathdiary.ui.theme.DeathDiaryTheme
+import com.deathdiary.ui.theme.MemoAmberTheme
 import com.deathdiary.security.BiometricAuthManager
 import com.deathdiary.security.SecurityManager
 
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
         biometricAuthManager = BiometricAuthManager(this)
 
         setContent {
-            DeathDiaryTheme {
+            MemoAmberTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
