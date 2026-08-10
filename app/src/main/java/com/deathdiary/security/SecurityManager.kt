@@ -3,6 +3,7 @@ package com.deathdiary.security
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import at.favre.lib.crypto.bcrypt.BCrypt
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -65,7 +66,8 @@ class SecurityManager(context: Context) {
     }
 
     fun setMasterPassword(password: String) {
-        val hash = hashPassword(password)
+        // 使用 BCrypt 生成安全的密码哈希（cost factor = 12）
+        val hash = BCrypt.withDefaults().hashToString(12, password.toCharArray())
         sharedPreferences.edit()
             .putString(PREF_MASTER_PASSWORD, hash)
             .apply()
@@ -74,16 +76,13 @@ class SecurityManager(context: Context) {
     fun verifyMasterPassword(password: String): Boolean {
         val storedHash = sharedPreferences.getString(PREF_MASTER_PASSWORD, null)
             ?: return false
-        return hashPassword(password) == storedHash
+        // 验证密码是否匹配 BCrypt 哈希
+        val result = BCrypt.verifyer().verify(password.toCharArray(), storedHash)
+        return result.verified
     }
 
     fun hasMasterPassword(): Boolean {
         return sharedPreferences.contains(PREF_MASTER_PASSWORD)
-    }
-
-    private fun hashPassword(password: String): String {
-        // Simple hash implementation - in production use proper password hashing
-        return password.hashCode().toString()
     }
 
     private fun getSecretKey(): SecretKey {
