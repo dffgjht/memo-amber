@@ -22,10 +22,10 @@ import com.deathdiary.data.entities.User
         CommunityComment::class,
         User::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
-abstract class DeathDiaryDatabase : RoomDatabase() {
+abstract class MemoAmberDatabase : RoomDatabase() {
     abstract fun diaryEntryDao(): DiaryEntryDao
     abstract fun vaultItemDao(): VaultItemDao
     abstract fun willDao(): WillDao
@@ -36,14 +36,14 @@ abstract class DeathDiaryDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: DeathDiaryDatabase? = null
+        private var INSTANCE: MemoAmberDatabase? = null
 
-        fun getDatabase(context: Context): DeathDiaryDatabase {
+        fun getDatabase(context: Context): MemoAmberDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    DeathDiaryDatabase::class.java,
-                    "death_diary_database"
+                    MemoAmberDatabase::class.java,
+                    "memo_amber_database"
                 ).build()
                 INSTANCE = instance
                 instance
