@@ -2,7 +2,7 @@
   <h1 align="center">🪵 记忆琥珀</h1>
   <p align="center"><strong>安全、私密的数字遗产管理安卓应用</strong></p>
   <p align="center">
-    <img src="https://img.shields.io/badge/version-v1.4.0-blue" alt="Version" />
+    <img src="https://img.shields.io/badge/version-v1.5.0-blue" alt="Version" />
     <img src="https://img.shields.io/badge/API-24%2B-green" alt="Android API" />
     <img src="https://img.shields.io/badge/license-MIT-orange" alt="License" />
     <img src="https://img.shields.io/badge/language-Kotlin-7F52FF" alt="Kotlin" />
@@ -65,6 +65,7 @@
 | 加密算法 | AES-256-GCM |
 | 密钥管理 | Android Keystore |
 | 身份认证 | Android Biometric API |
+| 密码哈希 | BCrypt (cost=12) |
 | 最低版本 | Android 7.0 (API 24) |
 | 目标版本 | Android 14 (API 34) |
 
@@ -75,6 +76,7 @@
 - **端到端加密** — 所有日记、密码、遗嘱等敏感数据使用 AES-256-GCM 对称加密
 - **硬件级密钥保护** — 加密密钥存储于 Android Keystore，由 TEE / StrongBox 保护，不可导出
 - **生物识别门禁** — 启动应用必须通过指纹或面容验证，充分利用设备硬件安全能力
+- **BCrypt 密码哈希** — 使用行业标准 BCrypt 算法存储密码，cost factor=12
 - **自动锁定机制** — 5 分钟无操作自动锁定，返回需重新认证
 - **零网络依赖** — 核心数据完全本地存储，不联网，不泄露
 
@@ -119,7 +121,7 @@ cd memo-amber
 # 构建 fat jar（包含所有依赖）
 ./gradlew :desktop:fatJar
 
-# 输出位置：desktop/build/libs/desktop-1.4.0-all.jar
+# 输出位置：desktop/build/libs/desktop-1.5.0-all.jar
 ```
 
 > ⚠️ **fat jar 签名说明**：`fatJar` 任务已配置排除 BouncyCastle 等库的签名文件（`.SF`/`.DSA`/`.RSA`/`.EC`），避免 `SecurityException: Invalid signature file digest` 错误。如果手动打包 fat jar，请确保排除这些文件。
@@ -129,13 +131,15 @@ cd memo-amber
 ```
 app/
 ├── src/main/
-│   ├── java/com/memoamber/
+│   ├── java/com/deathdiary/
 │   │   ├── data/              # 数据层 — Room 数据库、DAO、实体
-│   │   ├── di/                # 依赖注入模块
-│   │   ├── ui/                # Compose UI — 页面与组件
-│   │   ├── viewmodel/         # ViewModel 层
+│   │   ├── network/           # 网络层
 │   │   ├── security/          # 加密、Keystore、生物识别
-│   │   └── util/              # 工具类与扩展函数
+│   │   ├── ui/                # Compose UI — 页面与组件
+│   │   │   ├── screens/       # 各功能页面
+│   │   │   ├── theme/         # 主题配置
+│   │   │   └── viewmodels/    # ViewModel 层
+│   │   └── utils/             # 工具类与扩展函数
 │   └── res/                   # 资源文件
 ├── build.gradle.kts
 └── proguard-rules.pro
@@ -145,8 +149,9 @@ app/
 
 | 版本 | 日期 | 说明 |
 |:-----|:-----|:-----|
+| [v1.5.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.5.0) | 2026-08-10 | 安全修复、品牌名统一、版本号对齐 |
 | [v1.4.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0) | 2026-04-30 | 修复桌面端打包签名冲突 |
-| [v1.3.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0) | — | 首个公开发布版本 |
+| [v1.3.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0) | 2026-04-17 | 首个公开发布版本 |
 
 > 完整版本记录见 [Releases](https://github.com/dffgjht/memo-amber/releases)。
 
