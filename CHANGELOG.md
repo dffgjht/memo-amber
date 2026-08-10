@@ -5,6 +5,23 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [1.5.0] - 2026-08-10
+
+### Fixed
+- 修复版本号不一致问题（build.gradle 与 README 对齐）
+- 修复密码哈希安全漏洞：从 `hashCode()` 升级为 BCrypt (cost=12)
+- 修复 HomeScreen 标题显示为旧名称"存证纪"，更新为"记忆琥珀"
+
+### Changed
+- 主题名从 `DeathDiaryTheme` 重命名为 `MemoAmberTheme`
+- 数据库名和类名从 `DeathDiaryDatabase` 重命名为 `MemoAmberDatabase`
+- 添加 BCrypt 密码哈希库依赖 (`at.favre.lib:bcrypt:0.10.2`)
+- 版本号升级至 1.5.0 (versionCode=6)
+
+### Security
+- 密码存储从简单 hashCode() 升级为行业标准 BCrypt 哈希算法
+- BCrypt cost factor 设为 12，平衡安全性与性能
+
 ## [1.4.0] - 2026-04-30
 
 ### Fixed
@@ -106,6 +123,7 @@
 - 数字遗嘱
 - 回忆相册
 
+[1.5.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.5.0
 [1.4.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0
 [1.3.1]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.1
 [1.3.0]: https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0
