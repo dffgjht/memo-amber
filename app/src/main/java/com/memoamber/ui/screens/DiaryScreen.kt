@@ -3,6 +3,7 @@ package com.memoamber.ui.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +23,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.memoamber.data.MemoAmberDatabase
@@ -54,85 +54,67 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
                 try {
                     val dao = MemoAmberDatabase.getDatabase(context).diaryEntryDao()
                     entriesFlow.value = dao.getAllEntriesSync()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    isLoading = false
-                }
+                } catch (e: Exception) { e.printStackTrace() }
+                finally { isLoading = false }
             }
         }
     }
 
-    LaunchedEffect(Unit) {
-        loadEntries()
-    }
+    LaunchedEffect(Unit) { loadEntries() }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    if (isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                    } else {
-                        Text("日记", fontWeight = FontWeight.Bold)
-                    }
+                    if (isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    else Text("\uD83D\uDCD6 \u65E5\u8BB0", fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        editingEntry = null
-                        showEditDialog = true
-                    }) {
-                        Icon(Icons.Default.Add, contentDescription = "添加日记")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    editingEntry = null
-                    showEditDialog = true
-                },
-                containerColor = MaterialTheme.colorScheme.primary
+                onClick = { editingEntry = null; showEditDialog = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = RoundedCornerShape(18.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
             ) {
-                Icon(Icons.Default.Edit, contentDescription = "写日记")
+                Icon(Icons.Default.Edit, contentDescription = "Write diary")
             }
         }
     ) { paddingValues ->
         if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+            Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else if (entries.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Default.Book,
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp),
-                        tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(30.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("\uD83D\uDCDD", fontSize = 48.sp)
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text("\u8FD8\u6CA1\u6709\u65E5\u8BB0", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "\u70B9\u51FB\u53F3\u4E0B\u89D2\u6309\u94AE\u8BB0\u5F55\u4ECA\u5929\u7684\u5FC3\u60C5",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("还没有日记", style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.outline)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text("点击 + 记录今天的心情", style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f))
                 }
             }
         } else {
@@ -142,16 +124,13 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(entries, key = { it.id }) { entry ->
-                    DiaryEntryCard(
-                        entry = entry,
-                        onClick = { selectedEntry = entry }
-                    )
+                    DiaryEntryCard(entry = entry, onClick = { selectedEntry = entry })
                 }
+                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
     }
 
-    // 新建 / 编辑对话框
     if (showEditDialog) {
         DiaryEditDialog(
             initial = editingEntry,
@@ -161,14 +140,8 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
                     withContext(Dispatchers.IO) {
                         try {
                             val dao = MemoAmberDatabase.getDatabase(context).diaryEntryDao()
-                            if (entry.id > 0) {
-                                dao.updateEntry(entry)
-                            } else {
-                                dao.insertEntry(entry)
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                            if (entry.id > 0) dao.updateEntry(entry) else dao.insertEntry(entry)
+                        } catch (e: Exception) { e.printStackTrace() }
                     }
                     loadEntries()
                     showEditDialog = false
@@ -177,52 +150,33 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
         )
     }
 
-    // 详情对话框
     selectedEntry?.let { entry ->
         DiaryDetailDialog(
             entry = entry,
             onDismiss = { selectedEntry = null },
-            onEdit = {
-                selectedEntry = null
-                editingEntry = entry
-                showEditDialog = true
-            },
-            onDelete = {
-                selectedEntry = null
-                pendingDelete = entry
-            }
+            onEdit = { selectedEntry = null; editingEntry = entry; showEditDialog = true },
+            onDelete = { selectedEntry = null; pendingDelete = entry }
         )
     }
 
-    // 删除确认
     pendingDelete?.let { entry ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text("删除日记") },
-            text = { Text("确定要删除「${entry.title}」吗？此操作不可撤销。") },
+            title = { Text("\u5220\u9664\u65E5\u8BB0") },
+            text = { Text("\u786E\u5B9A\u8981\u5220\u9664\u300C${entry.title}\u300D\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u64A4\u9500\u3002") },
             confirmButton = {
                 TextButton(onClick = {
                     scope.launch {
                         withContext(Dispatchers.IO) {
-                            try {
-                                val dao = MemoAmberDatabase.getDatabase(context).diaryEntryDao()
-                                dao.deleteEntryById(entry.id)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
+                            try { MemoAmberDatabase.getDatabase(context).diaryEntryDao().deleteEntryById(entry.id) }
+                            catch (e: Exception) { e.printStackTrace() }
                         }
                         loadEntries()
                         pendingDelete = null
                     }
-                }) {
-                    Text("删除", color = MaterialTheme.colorScheme.error)
-                }
+                }) { Text("\u5220\u9664", color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) {
-                    Text("取消")
-                }
-            }
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("\u53D6\u6D88") } }
         )
     }
 }
@@ -231,12 +185,12 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
 fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = onClick
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -245,7 +199,7 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
                 Text(
                     text = entry.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
                 MoodBadge(mood = entry.mood)
@@ -255,7 +209,7 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
                 text = entry.content,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 4
+                maxLines = 3
             )
             Spacer(modifier = Modifier.height(12.dp))
             Row(
@@ -265,8 +219,7 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.CalendarToday, contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.outline)
+                        modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.outline)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = formatTimestampFull(entry.timestamp),
@@ -275,12 +228,7 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
                     )
                 }
                 if (entry.weather.isNotBlank()) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = weatherEmoji(entry.weather),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+                    Text(text = weatherEmoji(entry.weather), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -291,41 +239,35 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
 fun MoodBadge(mood: String) {
     val (emoji, label) = moodLabel(mood)
     Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        shape = RoundedCornerShape(12.dp)
+        color = MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(10.dp)
     ) {
         Text(
             text = "$emoji $label",
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
 }
 
-/** 心情 → 文案映射 */
 fun moodLabel(mood: String): Pair<String, String> = when (mood) {
-    "happy" -> "😊" to "开心"
-    "sad" -> "😢" to "难过"
-    "neutral" -> "😐" to "平静"
-    "excited" -> "🤩" to "兴奋"
-    "anxious" -> "😰" to "焦虑"
-    "angry" -> "😠" to "生气"
-    else -> "😐" to "平静"
+    "happy" -> "\uD83D\uDE0A" to "\u5F00\u5FC3"
+    "sad" -> "\uD83D\uDE22" to "\u96BE\u8FC7"
+    "neutral" -> "\uD83D\uDE10" to "\u5E73\u9759"
+    "excited" -> "\uD83E\uDD29" to "\u5174\u594B"
+    "anxious" -> "\uD83D\uDE30" to "\u7126\u8651"
+    "angry" -> "\uD83D\uDE20" to "\u751F\u6C14"
+    else -> "\uD83D\uDE10" to "\u5E73\u9759"
 }
 
-/** 天气 → emoji 映射 */
 fun weatherEmoji(weather: String): String = when (weather) {
-    "sunny" -> "☀️"
-    "cloudy" -> "⛅"
-    "rainy" -> "🌧️"
-    "snowy" -> "❄️"
-    "stormy" -> "⛈️"
-    "night" -> "🌙"
+    "sunny" -> "\u2600\uFE0F"; "cloudy" -> "\u26C5"; "rainy" -> "\uD83C\uDF27\uFE0F"
+    "snowy" -> "\u2744\uFE0F"; "stormy" -> "\u26C8\uFE0F"; "night" -> "\uD83C\uDF19"
     else -> ""
 }
 
-/** 新建 / 编辑日记对话框（编辑时传入 initial） */
 @Composable
 fun DiaryEditDialog(
     initial: DiaryEntry?,
@@ -341,9 +283,7 @@ fun DiaryEditDialog(
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
-    ) { uris ->
-        selectedImageUris = uris
-    }
+    ) { uris -> selectedImageUris = uris }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -356,7 +296,6 @@ fun DiaryEditDialog(
             shape = RoundedCornerShape(24.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Header
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -366,10 +305,10 @@ fun DiaryEditDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("取消", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text("\u53D6\u6D88", color = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                     Text(
-                        if (initial == null) "写日记" else "编辑日记",
+                        if (initial == null) "\u270F\uFE0F \u5199\u65E5\u8BB0" else "\uD83D\uDCDD \u7F16\u8F91\u65E5\u8BB0",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -387,21 +326,16 @@ fun DiaryEditDialog(
                                         weather = weather,
                                         tags = tags.trim(),
                                         isEncrypted = initial?.isEncrypted ?: true,
-                                        mediaPaths = if (selectedImageUris.isEmpty()) {
-                                            initial?.mediaPaths ?: ""
-                                        } else {
-                                            Gson().toJson(selectedImageUris.map { it.toString() })
-                                        }
+                                        mediaPaths = if (selectedImageUris.isEmpty()) initial?.mediaPaths ?: ""
+                                        else Gson().toJson(selectedImageUris.map { it.toString() })
                                     )
                                 )
                             }
                         },
                         enabled = title.isNotBlank() && content.isNotBlank()
                     ) {
-                        Text("保存",
-                            fontWeight = FontWeight.Bold,
-                            color = if (title.isNotBlank() && content.isNotBlank())
-                                MaterialTheme.colorScheme.primary
+                        Text("\u4FDD\u5B58", fontWeight = FontWeight.Bold,
+                            color = if (title.isNotBlank() && content.isNotBlank()) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.outline)
                     }
                 }
@@ -413,31 +347,23 @@ fun DiaryEditDialog(
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // 标题
                     OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        label = { Text("标题") },
+                        value = title, onValueChange = { title = it },
+                        label = { Text("\u6807\u9898") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
-                        textStyle = LocalTextStyle.current.copy(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp)
                     )
 
-                    // 心情选择
                     Column {
-                        Text("今天心情", style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("\u4ECA\u5929\u5FC3\u60C5", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(8.dp))
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(listOf(
-                                "happy" to "😊开心", "sad" to "😢难过",
-                                "neutral" to "😐平静", "excited" to "🤩兴奋",
-                                "anxious" to "😰焦虑", "angry" to "😠生气"
-                            )) { (value, label) ->
+                            items(listOf("happy" to "\uD83D\uDE0A\u5F00\u5FC3", "sad" to "\uD83D\uDE22\u96BE\u8FC7",
+                                "neutral" to "\uD83D\uDE10\u5E73\u9759", "excited" to "\uD83E\uDD29\u5174\u594B",
+                                "anxious" to "\uD83D\uDE30\u7126\u8651", "angry" to "\uD83D\uDE20\u751F\u6C14")) { (value, label) ->
                                 FilterChip(
-                                    selected = mood == value,
-                                    onClick = { mood = value },
+                                    selected = mood == value, onClick = { mood = value },
                                     label = { Text(label, fontSize = 13.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
                                         selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
@@ -447,20 +373,15 @@ fun DiaryEditDialog(
                         }
                     }
 
-                    // 天气选择
                     Column {
-                        Text("天气状况", style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("\u5929\u6C14\u72B6\u51B5", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(8.dp))
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(listOf(
-                                "sunny" to "☀️晴", "cloudy" to "⛅多云",
-                                "rainy" to "🌧️雨", "snowy" to "❄️雪",
-                                "stormy" to "⛈️雷雨", "night" to "🌙夜晚"
-                            )) { (value, label) ->
+                            items(listOf("sunny" to "\u2600\uFE0F\u6674", "cloudy" to "\u26C5\u591A\u4E91",
+                                "rainy" to "\uD83C\uDF27\uFE0F\u96E8", "snowy" to "\u2744\uFE0F\u96EA",
+                                "stormy" to "\u26C8\uFE0F\u96F7\u96E8", "night" to "\uD83C\uDF19\u591C\u665A")) { (value, label) ->
                                 FilterChip(
-                                    selected = weather == value,
-                                    onClick = { weather = value },
+                                    selected = weather == value, onClick = { weather = value },
                                     label = { Text(label, fontSize = 13.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
                                         selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer
@@ -470,54 +391,38 @@ fun DiaryEditDialog(
                         }
                     }
 
-                    // 内容
                     OutlinedTextField(
-                        value = content,
-                        onValueChange = { content = it },
-                        label = { Text("记录今天发生的事情...") },
+                        value = content, onValueChange = { content = it },
+                        label = { Text("\u8BB0\u5F55\u4ECA\u5929\u53D1\u751F\u7684\u4E8B\u60C5...") },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
-                        minLines = 8,
-                        maxLines = 20,
-                        shape = RoundedCornerShape(12.dp)
+                        minLines = 8, maxLines = 20,
+                        shape = RoundedCornerShape(14.dp)
                     )
 
-                    // 标签
                     OutlinedTextField(
-                        value = tags,
-                        onValueChange = { tags = it },
-                        label = { Text("标签（多个标签用逗号分隔）") },
+                        value = tags, onValueChange = { tags = it },
+                        label = { Text("\u6807\u7B7E\uFF08\u9017\u53F7\u5206\u9694\uFF09") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(14.dp),
                         leadingIcon = { Icon(Icons.Default.Tag, contentDescription = null) }
                     )
 
-                    // 添加图片
                     Column {
-                        Text("添加照片", style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("\u6DFB\u52A0\u7167\u7247", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                             FilledTonalButton(
                                 onClick = { imagePicker.launch("image/*") },
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(Icons.Default.PhotoLibrary, contentDescription = null,
-                                    modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.PhotoLibrary, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("从相册选择")
+                                Text("\u4ECE\u76F8\u518C\u9009\u62E9")
                             }
                             if (selectedImageUris.isNotEmpty()) {
-                                Surface(
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = MaterialTheme.colorScheme.primaryContainer
-                                ) {
-                                    Text("已选${selectedImageUris.size}张",
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                        style = MaterialTheme.typography.labelSmall)
+                                Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primaryContainer) {
+                                    Text("\u5DF2\u9009${selectedImageUris.size}\u5F20", modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall)
                                 }
                             }
                         }
@@ -528,7 +433,6 @@ fun DiaryEditDialog(
     }
 }
 
-/** 日记详情对话框 */
 @Composable
 fun DiaryDetailDialog(
     entry: DiaryEntry,
@@ -547,7 +451,6 @@ fun DiaryDetailDialog(
             shape = RoundedCornerShape(24.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Header
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -556,17 +459,10 @@ fun DiaryDetailDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            "日记详情",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
+                    Text("\uD83D\uDCD6 \u65E5\u8BB0\u8BE6\u60C5", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer)
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "关闭",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
 
@@ -576,21 +472,17 @@ fun DiaryDetailDialog(
                         .verticalScroll(rememberScrollState())
                         .padding(20.dp)
                 ) {
-                    Text(
-                        text = entry.title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(entry.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         MoodBadge(mood = entry.mood)
                         Spacer(modifier = Modifier.width(8.dp))
                         if (entry.weather.isNotBlank()) {
                             Text(
-                                text = "${weatherEmoji(entry.weather)} ${
+                                "${weatherEmoji(entry.weather)} ${
                                     when (entry.weather) {
-                                        "sunny" -> "晴"; "cloudy" -> "多云"; "rainy" -> "雨"
-                                        "snowy" -> "雪"; "stormy" -> "雷雨"; "night" -> "夜晚"
+                                        "sunny" -> "\u6674"; "cloudy" -> "\u591A\u4E91"; "rainy" -> "\u96E8"
+                                        "snowy" -> "\u96EA"; "stormy" -> "\u96F7\u96E8"; "night" -> "\u591C\u665A"
                                         else -> entry.weather
                                     }
                                 }",
@@ -600,43 +492,29 @@ fun DiaryDetailDialog(
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = formatTimestampFull(entry.timestamp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+                    Text(formatTimestampFull(entry.timestamp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
                     if (entry.tags.isNotBlank()) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "🏷️ ${entry.tags}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Text("\uD83C\uDFF7\uFE0F ${entry.tags}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider()
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = entry.content,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Text(entry.content, style = MaterialTheme.typography.bodyLarge)
                 }
 
-                // Footer 操作按钮
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = onDelete) {
-                        Text("删除", color = MaterialTheme.colorScheme.error)
-                    }
+                    TextButton(onClick = onDelete) { Text("\u5220\u9664", color = MaterialTheme.colorScheme.error) }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = onEdit) {
+                    Button(onClick = onEdit, shape = RoundedCornerShape(12.dp)) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("编辑")
+                        Text("\u7F16\u8F91")
                     }
                 }
             }
