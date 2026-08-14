@@ -1,9 +1,11 @@
 package com.memoamber.security
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import android.util.Log
 import java.security.KeyStore
 import java.security.SecureRandom
 import javax.crypto.Cipher
@@ -19,13 +21,20 @@ import javax.crypto.spec.PBEKeySpec
  * - 主密码使用 PBKDF2WithHmacSHA256 加盐哈希存储（与桌面端 Argon2id 对齐的安全强度）
  * - 数据加密使用 Android Keystore 中的 AES-256-GCM 密钥
  * - 兼容旧版（String.hashCode）哈希，老用户升级后无需重新设置密码
+ *
+ * 注意：不再使用 setUserAuthenticationRequired(true)，
+ * 因为它会导致：1) 无锁屏设备上生成密钥直接抛异常（启动闪退）；
+ * 2) 认证有效期过后解密抛 UserNotAuthenticatedException（运行中闪退）。
+ * 应用本身已有主密码认证层，密钥只需 Keystore 硬件级保护即可。
  */
 class SecurityManager(context: Context) {
 
+    private val appContext = context.applicationContext
     private val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
-    private val sharedPreferences = context.getSharedPreferences("death_diary_secure", Context.MODE_PRIVATE)
+    private val sharedPreferences = appContext.getSharedPreferences("death_diary_secure", Context.MODE_PRIVATE)
 
     companion object {
+        private const val TAG = "SecurityManager"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         private const val KEY_ALIAS = "death_diary_master_key"
         private const val PREF_MASTER_PASSWORD = "master_password_hash"
@@ -38,31 +47,39 @@ class SecurityManager(context: Context) {
     }
 
     init {
-        ensureKeyExists()
+        // 密钥生成失败不应阻断应用启动（例如无锁屏/Keystore 不可用/模拟器）。
+        // 即使密钥不可用，主密码哈希（PBKDF2，纯 Java）仍然正常工作。
+        try {
+            ensureKeyExists()
+        } catch (e: Exception) {
+            Log.e(TAG, "ensureKeyExists failed: ${e.message}", e)
+        }
     }
 
     private fun ensureKeyExists() {
         if (!keyStore.containsAlias(KEY_ALIAS)) {
-            val keyGenerator = KeyGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_AES,
-                ANDROID_KEYSTORE
-            )
-
-            val keyGenSpec = KeyGenParameterSpec.Builder(
-                KEY_ALIAS,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-            )
-                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                // 注意：仅在用户解锁设备后 30 秒内允许使用密钥，
-                // 保证加密数据不会在锁屏状态下被读取
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(30)
-                .build()
-
-            keyGenerator.init(keyGenSpec)
-            keyGenerator.generateKey()
+            generateKey()
         }
+    }
+
+    /**
+     * 生成 AES-GCM 密钥。不要求系统用户认证（见类注释）。
+     * 生成失败时抛给调用方；init 已兜底，不会导致闪退。
+     */
+    private fun generateKey() {
+        val keyGenerator = KeyGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_AES,
+            ANDROID_KEYSTORE
+        )
+        val keyGenSpec = KeyGenParameterSpec.Builder(
+            KEY_ALIAS,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .build()
+        keyGenerator.init(keyGenSpec)
+        keyGenerator.generateKey()
     }
 
     /**
@@ -147,7 +164,18 @@ class SecurityManager(context: Context) {
     }
 
     private fun getSecretKey(): SecretKey {
-        return keyStore.getKey(KEY_ALIAS, null) as SecretKey
+        return try {
+            keyStore.getKey(KEY_ALIAS, null) as SecretKey
+        } catch (e: Exception) {
+            // 密钥可能被系统删除（例如生物特征变更/设备重置 Keystore），重建后重试一次
+            Log.w(TAG, "getSecretKey failed (${e.message}), regenerating")
+            try {
+                keyStore.deleteEntry(KEY_ALIAS)
+            } catch (ignored: Exception) {
+            }
+            generateKey()
+            keyStore.getKey(KEY_ALIAS, null) as SecretKey
+        }
     }
 
     private fun getCipher(): Cipher {

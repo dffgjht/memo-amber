@@ -2,8 +2,8 @@ package com.memoamber
 
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,7 +19,7 @@ import com.memoamber.ui.theme.MemoAmberTheme
 import com.memoamber.security.BiometricAuthManager
 import com.memoamber.security.SecurityManager
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private lateinit var securityManager: SecurityManager
     private lateinit var biometricAuthManager: BiometricAuthManager
