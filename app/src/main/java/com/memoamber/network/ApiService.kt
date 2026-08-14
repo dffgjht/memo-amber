@@ -156,8 +156,9 @@ data class LoginRequest(
 
 data class AuthResponse(
     val success: Boolean,
-    val token: String,
-    val user: User
+    val token: String? = null,
+    val user: User? = null,
+    val message: String? = null
 )
 
 data class LogoutResponse(

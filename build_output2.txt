@@ -1,0 +1,167 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+
+> Task :app:kaptGenerateStubsDebugKotlin
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:91:70 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:91:70 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:111:115 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:114:48 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:154:9 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:154:26 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:155:13 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:155:19 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:155:21 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:155:26 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:156:13 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:156:23 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:156:25 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:156:49 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:157:13 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:157:20 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:157:22 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:157:91 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:158:13 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:158:22 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:158:24 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:159:9 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:160:5 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:163:5 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:163:18 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:163:20 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:163:24 Expecting a top level declaration
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:163:32 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:167:72 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:168:27 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:182:6 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:257:29 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:267:37 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:267:56 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:313:71 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:313:72 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:314:69 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:315:53 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:317:21 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:365:101 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:365:101 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:382:101 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:382:101 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:383:114 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:385:64 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:390:34 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:405:58 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:406:36 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:406:37 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:426:185 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:426:185 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:431:18 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:485:89 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/DiaryScreen.kt:486:92 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:68:44 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:118:52 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:119:29 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:119:46 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:128:39 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:129:33 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:129:34 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:146:92 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:147:29 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:155:41 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:156:33 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:156:34 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:156:50 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:157:32 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:157:47 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:157:59 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:157:65 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:202:76 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:203:35 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:211:14 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:213:98 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:221:56 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:224:37 Expecting an expression
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:225:48 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:230:105 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:248:58 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:249:26 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:249:106 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:250:35 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:271:14 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:280:82 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:281:39 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:297:18 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:322:95 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:322:96 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:339:10 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:340:6 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:463:37 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:464:14 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:489:49 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:490:32 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:490:33 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:500:14 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:501:10 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:518:10 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:520:5 Expecting an element
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:521:2 Expecting ','
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:554:137 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:555:138 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:556:37 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:557:175 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:558:122 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:559:183 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:560:37 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:563:124 Expecting '"'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:563:124 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:568:2 Expecting ')'
+e: file:///C:/Users/Administrator/.qwenpaw/workspaces/default/memo-amber/app/src/main/java/com/memoamber/ui/screens/SettingsScreen.kt:568:2 Expecting '}'
+
+> Task :app:kaptGenerateStubsDebugKotlin FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:kaptGenerateStubsDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 28s
+28 actionable tasks: 2 executed, 26 up-to-date
