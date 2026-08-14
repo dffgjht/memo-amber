@@ -43,6 +43,7 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
     var editingEntry by remember { mutableStateOf<DiaryEntry?>(null) }
     var selectedEntry by remember { mutableStateOf<DiaryEntry?>(null) }
     var pendingDelete by remember { mutableStateOf<DiaryEntry?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val entriesFlow = remember { MutableStateFlow<List<DiaryEntry>>(emptyList()) }
     val entries by entriesFlow.collectAsState()
@@ -63,6 +64,7 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
     LaunchedEffect(Unit) { loadEntries() }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -124,7 +126,12 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(entries, key = { it.id }) { entry ->
-                    DiaryEntryCard(entry = entry, onClick = { selectedEntry = entry })
+                    DiaryEntryCard(
+                        entry = entry,
+                        onClick = { selectedEntry = entry },
+                        onEdit = { editingEntry = entry; showEditDialog = true },
+                        onDelete = { pendingDelete = entry }
+                    )
                 }
                 item { Spacer(modifier = Modifier.height(80.dp)) }
             }
@@ -145,6 +152,7 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
                     }
                     loadEntries()
                     showEditDialog = false
+                    snackbarHostState.showSnackbar(if (entry.id > 0) "\u65E5\u8BB0\u5DF2\u4FDD\u5B58" else "\u65B0\u65E5\u8BB0\u5DF2\u521B\u5EFA")
                 }
             }
         )
@@ -173,6 +181,7 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
                         }
                         loadEntries()
                         pendingDelete = null
+                        snackbarHostState.showSnackbar("\u65E5\u8BB0\u5DF2\u5220\u9664")
                     }
                 }) { Text("\u5220\u9664", color = MaterialTheme.colorScheme.error) }
             },
@@ -182,7 +191,14 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
 }
 
 @Composable
-fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
+fun DiaryEntryCard(
+    entry: DiaryEntry,
+    onClick: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
@@ -203,6 +219,31 @@ fun DiaryEntryCard(entry: DiaryEntry, onClick: () -> Unit) {
                     modifier = Modifier.weight(1f)
                 )
                 MoodBadge(mood = entry.mood)
+                Spacer(modifier = Modifier.width(4.dp))
+                // 卡片快捷操作菜单：编辑 / 删除
+                Box {
+                    IconButton(onClick = { menuExpanded = true }, modifier = Modifier.size(32.dp)) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "更多操作",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("\u270F\uFE0F \u7F16\u8F91") },
+                            onClick = { menuExpanded = false; onEdit() }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("\uD83D\uDDD1\uFE0F \u5220\u9664", color = MaterialTheme.colorScheme.error) },
+                            onClick = { menuExpanded = false; onDelete() }
+                        )
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Text(
@@ -279,7 +320,15 @@ fun DiaryEditDialog(
     var mood by remember { mutableStateOf(initial?.mood ?: "neutral") }
     var weather by remember { mutableStateOf(initial?.weather ?: "sunny") }
     var tags by remember { mutableStateOf(initial?.tags ?: "") }
-    var selectedImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    var selectedImageUris by remember {
+        mutableStateOf(
+            runCatching {
+                val paths = initial?.mediaPaths
+                if (paths.isNullOrBlank()) emptyList()
+                else Gson().fromJson(paths, Array<String>::class.java).map { Uri.parse(it) }
+            }.getOrDefault(emptyList())
+        )
+    }
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
