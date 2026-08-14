@@ -21,3 +21,6 @@ migrate_package.ps1
 
 # Local config
 local.properties
+"build_output*.txt"  
+"*.apk"  
+"gen_icons.py"  
