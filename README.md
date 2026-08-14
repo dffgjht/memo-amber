@@ -1,15 +1,199 @@
 <p align="center">
-  <h1 align="center">🪵 记忆琥珀</h1>
-  <p align="center"><strong>安全、私密的数字遗产管理安卓应用</strong></p>
+  <h1 align="center">🪵 记忆琥珀 · Memo Amber</h1>
+  <p align="center"><strong>Secure, private digital legacy management app for Android & Desktop</strong></p>
   <p align="center">
-    <img src="https://img.shields.io/badge/version-v1.5.0-blue" alt="Version" />
+    <a href="#english">
+      <img src="https://img.shields.io/badge/Language-English-blue" alt="English" />
+    </a>
+    <a href="#中文">
+      <img src="https://img.shields.io/badge/Language-中文-orange" alt="中文" />
+    </a>
+    <img src="https://img.shields.io/badge/version-v1.6.0-blue" alt="Version" />
     <img src="https://img.shields.io/badge/API-24%2B-green" alt="Android API" />
     <img src="https://img.shields.io/badge/license-MIT-orange" alt="License" />
     <img src="https://img.shields.io/badge/language-Kotlin-7F52FF" alt="Kotlin" />
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome" />
   </p>
 </p>
 
 ---
+
+<a id="english"></a>
+# 🇺🇸 English
+
+## 📛 The Name: Why "Memo Amber"?
+
+> **Amber** — nature's oldest memory keeper.
+>
+> Tens of millions of years ago, a drop of tree resin accidentally wrapped a leaf or a tiny insect, quietly solidifying over the ages and preserving that exact moment, perfectly intact, to this day.
+>
+> **Memo Amber** does exactly the same thing: it seals your diary, digital will, passwords, and precious photos inside your phone with AES-256 encryption and hardware-backed keys from the Android Keystore. No network, no upload, no leakage — protected forever, like life trapped in amber. 🪵✨
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|:--------|:------------|
+| 🔐 **Biometric Authentication** | Fingerprint / face unlock, blocks unauthorized access |
+| 🛡️ **AES-256 Encrypted Storage** | All sensitive data encrypted with AES-256-GCM, keys managed by Android Keystore |
+| 📔 **Diary System** | Rich-text diary with mood / weather / tags / photos, automatic timestamps |
+| ✏️ **Diary Editing** | Edit or delete existing entries anytime |
+| 🔑 **Password Vault** | Securely store account credentials, one-tap copy |
+| 📜 **Digital Will ("Unsent Letters")** | Write letters to loved ones, optionally scheduled for delivery via SMS / email |
+| 👥 **Contact Profiles** | Profiles of important people — could serve as will contacts or quick recipients |
+| 📸 **Encrypted Gallery** | Private album for treasured photos & memories |
+| 💬 **Community Message Board** | Leave messages and farewells for family |
+| 💾 **Backup / Restore** | Local encrypted backup export & restore, no data loss |
+| ⏱️ **Auto-Lock** | Auto-locks 5 minutes after leaving the app |
+| 🖥️ **Desktop Edition** | Cross-platform build with Compose for Desktop (Windows / macOS / Linux) |
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="screenshot.png" alt="Memo Amber main screen" width="360" />
+</p>
+
+> 📌 More screenshots can be added under `docs/screenshots/`.
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
+|:---------|:-----------|
+| Language | Kotlin 1.9.20 |
+| UI Framework | Jetpack Compose (Material 3) |
+| Local Database | Room Database |
+| Encryption | AES-256-GCM |
+| Key Management | Android Keystore |
+| Authentication | Android Biometric API |
+| Min SDK | Android 7.0 (API 24) |
+| Target SDK | Android 14 (API 34) |
+
+## 🔒 Security First
+
+Memo Amber treats security as the top priority from the ground up:
+
+- **End-to-end encryption** — diaries, passwords, wills and other sensitive data are encrypted with AES-256-GCM
+- **Hardware-backed keys** — encryption keys live in the Android Keystore, protected by TEE / StrongBox, never exportable
+- **Biometric gate** — launching the app requires fingerprint or face verification
+- **Auto-lock** — locks after 5 minutes of inactivity, re-authentication required on return
+- **Zero network dependency** — core data is stored fully locally, nothing leaves your device
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Android Studio Hedgehog (2023.1.1) or newer
+- JDK 17+
+- Android SDK including API 34
+
+### From Android Studio
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/dffgjht/memo-amber.git
+   ```
+2. Open the project directory in Android Studio
+3. Wait for Gradle sync to finish
+4. Connect a device or start an emulator (API 24+)
+5. Hit **Run** ▶️
+
+### From the command line (Android)
+
+```bash
+git clone https://github.com/dffgjht/memo-amber.git
+cd memo-amber
+
+# Debug build (use gradlew.bat on Windows)
+./gradlew assembleDebug
+
+# Install to a connected device
+./gradlew installDebug
+```
+
+### Desktop build
+
+The desktop edition is built with Kotlin + Jetpack Compose for Desktop (Material3) and runs on Windows / macOS / Linux.
+
+```bash
+# Build a fat jar (bundles all dependencies)
+./gradlew :desktop:fatJar
+
+# Output: desktop/build/libs/desktop-1.5.0-all.jar
+```
+
+> ⚠️ **Signature note**: the `fatJar` task excludes signature files (`.SF`/`.DSA`/`.RSA`/`.EC`) of libraries such as BouncyCastle to avoid `SecurityException: Invalid signature file digest`. If you package a fat jar manually, make sure to exclude those files too.
+
+## 📁 Project Structure
+
+```
+├── app/                        # Android app
+│   └── src/main/
+│       ├── java/com/memoamber/
+│       │   ├── data/           # Data layer — Room database, DAOs, entities
+│       │   ├── network/        # Network layer — Retrofit client & API (community feature)
+│       │   ├── security/       # Encryption, Keystore, biometrics
+│       │   ├── ui/
+│       │   │   ├── screens/    # Compose screens (diary/vault/will/gallery/community/settings)
+│       │   │   ├── theme/      # Material 3 theme
+│       │   │   └── viewmodels/ # ViewModel layer
+│       │   └── utils/          # Utilities (backup/restore, media files)
+│       └── res/                # Resources
+├── desktop/                    # Desktop edition (Compose for Desktop, Kotlin JVM)
+│   └── src/main/kotlin/com/memoamber/desktop/
+│       ├── data/               # SQLite + Argon2id encrypted storage
+│       └── ui/                 # Desktop Compose UI
+├── build.gradle.kts
+├── gradlew / gradlew.bat       # Gradle Wrapper (Windows / Unix)
+└── CHANGELOG.md
+```
+
+## 🗺️ Roadmap — Help Shape the Future
+
+Ideas we'd love community help with:
+
+- [ ] Localization (i18n) — English / 中文 / more languages
+- [ ] Cloud backup with end-to-end encryption (your key, your data)
+- [ ] Auto-delivery of "Unsent Letters" via scheduled SMS / email
+- [ ] Widgets & quick capture for diary
+- [ ] More vault categories (bank cards, identity documents, notes)
+- [ ] Community board moderation & anti-spam
+- [ ] Unit / UI test coverage
+
+Have a feature in mind? Open an [issue](https://github.com/dffgjht/memo-amber/issues) or submit a PR!
+
+## 🤝 Contributing
+
+Contributions of all kinds are welcome — code, docs, translations, design, bug reports, and feature ideas!
+
+1. **Fork** the repo
+2. Create your feature branch: `git checkout -b feat/your-feature`
+3. Commit your changes: `git commit -am 'feat: add something awesome'`
+4. Push to the branch: `git push origin feat/your-feature`
+5. Open a **Pull Request** 🚀
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details. Every contributor counts — let's preserve memories together.
+
+## 📋 Version History
+
+| Version | Date | Notes |
+|:--------|:-----|:------|
+| [v1.6.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.6.0) | 2026-08-12 | Apple-inspired UI refresh, contacts profiles, diary editing & swipe-to-delete |
+| [v1.5.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.5.0) | 2026-08-10 | Diary DB integration, PBKDF2 password hashing, unified package `com.memoamber` |
+| [v1.4.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0) | 2026-04-30 | Fixed desktop packaging signature conflicts |
+| [v1.3.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0) | — | First public release |
+
+> Full changelog on the [Releases](https://github.com/dffgjht/memo-amber/releases) page.
+
+## 📄 License
+
+This project is open-sourced under the [MIT License](LICENSE).
+
+---
+---
+
+<a id="中文"></a>
+# 🇨🇳 中文
 
 ## 📛 命名寓意
 
@@ -32,7 +216,8 @@
 | 📔 **日记系统** | 富文本日记，支持心情 / 天气 / 标签与照片，自动记录时间戳 |
 | ✏️ **日记编辑** | 随时修改或删除已有日记 |
 | 🔑 **密码保险箱** | 安全存储账号密码，一键复制 |
-| 📜 **数字遗嘱** | 编写遗嘱，支持通过短信 / 邮件定时发送 |
+| 📜 **未寄出的信（数字遗嘱）** | 写给重要之人的信，支持通过短信 / 邮件定时送达 |
+| 👥 **关系人档案** | 重要人物档案，可作遗言联络人或快速发送对象 |
 | 📸 **回忆相册** | 加密相册，保存珍贵照片与回忆 |
 | 💬 **社区留言板** | 为亲人留下寄语与留言 |
 | 💾 **数据备份 / 恢复** | 本地备份导出与恢复，数据不丢失 |
@@ -141,19 +326,42 @@ cd memo-amber
 └── CHANGELOG.md
 ```
 
+## 🗺️ 路线图 — 一起塑造未来
+
+期待社区一起实现的方向：
+
+- [ ] 国际化（i18n）— 英文 / 中文 / 更多语言
+- [ ] 端到端加密的云备份（密钥只属于你）
+- [ ] "未寄出的信"定时自动送达（短信 / 邮件）
+- [ ] 日记小组件与快速记录
+- [ ] 更多保险箱分类（银行卡、证件、笔记）
+- [ ] 社区留言板审核与反垃圾
+- [ ] 单元测试 / UI 测试覆盖
+
+有想法？开 [Issue](https://github.com/dffgjht/memo-amber/issues) 或直接提 PR！
+
+## 🤝 贡献指南
+
+欢迎任何形式的贡献 —— 代码、文档、翻译、设计、Bug 报告与功能建议！
+
+1. **Fork** 仓库
+2. 创建功能分支：`git checkout -b feat/your-feature`
+3. 提交改动：`git commit -am 'feat: add something awesome'`
+4. 推送分支：`git push origin feat/your-feature`
+5. 发起 **Pull Request** 🚀
+
+详见 [CONTRIBUTING.md](CONTRIBUTING.md)。每一位贡献者都重要 —— 一起守护记忆。
+
 ## 📋 版本历史
 
 | 版本 | 日期 | 说明 |
 |:-----|:-----|:-----|
+| [v1.6.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.6.0) | 2026-08-12 | Apple 质感 UI 重构、关系人档案、日记编辑与左滑删除 |
 | [v1.5.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.5.0) | 2026-08-10 | 日记接入数据库、密码哈希升级 PBKDF2、包名统一为 com.memoamber |
 | [v1.4.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.4.0) | 2026-04-30 | 修复桌面端打包签名冲突 |
 | [v1.3.0](https://github.com/dffgjht/memo-amber/releases/tag/v1.3.0) | — | 首个公开发布版本 |
 
 > 完整版本记录见 [Releases](https://github.com/dffgjht/memo-amber/releases)。
-
-## 🤝 贡献
-
-欢迎贡献！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
 
 ## 📄 许可证
 
