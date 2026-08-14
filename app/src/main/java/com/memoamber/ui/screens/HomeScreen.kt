@@ -102,8 +102,8 @@ fun HomeScreen(
                 ),
                 FeatureItem(
                     icon = Icons.Default.EditNote,
-                    title = "遗嘱/遗言",
-                    subtitle = "留下最后话语",
+                    title = "未寄出的信",
+                    subtitle = "留下最后的嘱托",
                     gradient = AmberGradients.will,
                     iconTint = Color(0xFFEC4899),
                     onClick = onNavigateToWill

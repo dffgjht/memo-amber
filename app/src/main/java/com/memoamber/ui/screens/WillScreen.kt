@@ -70,7 +70,7 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                     if (isLoading) {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp))
                     } else {
-                        Text("遗嘱 / 遗言", fontWeight = FontWeight.Bold)
+                        Text("未寄出的信", fontWeight = FontWeight.Bold)
                     }
                 },
                 navigationIcon = {
@@ -80,7 +80,7 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                 },
                 actions = {
                     IconButton(onClick = { editingWill = null; showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "添加遗嘱")
+                        Icon(Icons.Default.Add, contentDescription = "写一封信")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -95,7 +95,7 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                 onClick = { editingWill = null; showAddDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Edit, contentDescription = "添加遗嘱")
+                Icon(Icons.Default.Edit, contentDescription = "写一封信")
             }
         }
     ) { paddingValues ->
@@ -119,10 +119,10 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                         tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("还没有创建遗嘱", style = MaterialTheme.typography.titleMedium,
+                    Text("还没有写下的信", style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.outline)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("点击 + 写下对家人的嘱托", style = MaterialTheme.typography.bodyMedium,
+                    Text("点击 + 写下想说却未说出口的话", style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f))
                 }
             }
@@ -182,7 +182,7 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                     val isEditing = editingWill != null
                     showAddDialog = false
                     editingWill = null
-                    snackbarHostState.showSnackbar(if (isEditing) "遗言已更新" else "遗言已创建")
+                    snackbarHostState.showSnackbar(if (isEditing) "信已修改" else "信已写好")
                 }
             }
         )
@@ -192,7 +192,7 @@ fun WillScreen(onNavigateBack: () -> Unit) {
     pendingDelete?.let { will ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text("删除遗言") },
+            title = { Text("删除信件") },
             text = { Text("确定要删除「${will.title}」吗？此操作不可撤销。") },
             confirmButton = {
                 TextButton(onClick = {
@@ -203,7 +203,7 @@ fun WillScreen(onNavigateBack: () -> Unit) {
                         }
                         loadWills()
                         pendingDelete = null
-                        snackbarHostState.showSnackbar("遗言已删除")
+                        snackbarHostState.showSnackbar("信件已删除")
                     }
                 }) { Text("删除", color = MaterialTheme.colorScheme.error) }
             },
@@ -360,7 +360,7 @@ fun AddWillFullDialog(
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
-                Text(if (initial == null) "创建遗嘱" else "编辑遗嘱",
+                Text(if (initial == null) "写一封信" else "修改信件",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold)
                 
@@ -379,7 +379,7 @@ fun AddWillFullDialog(
                 OutlinedTextField(
                     value = content,
                     onValueChange = { content = it },
-                    label = { Text("遗言内容 *") },
+                    label = { Text("信件内容 *") },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
                     minLines = 6
                 )
