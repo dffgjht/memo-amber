@@ -1,4 +1,203 @@
-# 贡献指南
+<p align="center">
+  <a href="#english">
+    <img src="https://img.shields.io/badge/Language-English-blue" alt="English" />
+  </a>
+  <a href="#中文">
+    <img src="https://img.shields.io/badge/Language-中文-orange" alt="中文" />
+  </a>
+</p>
+
+---
+
+<a id="english"></a>
+# 🇺🇸 Contributing Guide
+
+Thank you for your interest in **Memo Amber**! All kinds of contributions are welcome — code, docs, translations, design, bug reports, and feature ideas. Every contributor counts. 🎉
+
+## Quick Start
+
+### 1. Fork & clone
+
+```bash
+git clone https://github.com/<your-username>/memo-amber.git
+cd memo-amber
+
+# Add the upstream repository
+git remote add upstream https://github.com/dffgjht/memo-amber.git
+```
+
+### 2. Sync with the latest code
+
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
+
+### 3. Create a branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+**Branch naming conventions:**
+
+| Type | Format | Example |
+|:-----|:-------|:--------|
+| New feature | `feature/<description>` | `feature/community-board` |
+| Bug fix | `fix/<description>` | `fix/login-crash` |
+| Docs | `docs/<description>` | `docs/update-readme` |
+| Refactor | `refactor/<description>` | `refactor/database-layer` |
+| Tests | `test/<description>` | `test/viewmodel-unit` |
+
+### 4. Open in Android Studio
+
+Open the project root directory in Android Studio and wait for the Gradle sync to finish.
+
+## Commit Message Format
+
+Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Type values:**
+
+| Type | Description |
+|:-----|:------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation changes |
+| `style` | Code formatting (no functional change) |
+| `refactor` | Code refactoring |
+| `perf` | Performance improvement |
+| `test` | Tests |
+| `chore` | Build / tooling changes |
+| `ci` | CI/CD configuration changes |
+
+**Example:**
+
+```
+feat(community): add like feature to message board
+
+- Implement like API call
+- Add like animation
+- Support unliking
+
+Closes #42
+```
+
+## Submitting a Pull Request
+
+### Checklist before opening a PR
+
+- [ ] Code compiles without warnings
+- [ ] All existing tests pass
+- [ ] New tests added for new functionality
+- [ ] Code follows project conventions
+- [ ] Commit messages follow the Conventional Commits format
+
+### Steps
+
+1. Make sure your branch is up to date:
+   ```bash
+   git fetch upstream
+   git rebase upstream/main
+   ```
+2. Push to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+3. Open a Pull Request on GitHub and fill in:
+   - **Title**: concise description of the change, following Conventional Commits
+   - **Description**: why, what, and how it was tested
+   - **Linked issue**: use `Closes #<issue-number>` to auto-close issues
+
+## Code Style
+
+Follow the [Kotlin Coding Conventions](https://kotlinlang.org/docs/coding-conventions.html).
+
+### General principles
+
+- Use meaningful names for variables and functions; avoid abbreviations (except well-known ones like `id`, `url`)
+- Keep functions under 40 lines; split them when they grow
+- Public APIs must have KDoc comments
+- Separate logical blocks with blank lines
+
+### Kotlin style
+
+```kotlin
+// Class names: UpperCamelCase
+class UserProfileViewModel { }
+
+// Functions and variables: lowerCamelCase
+fun calculateHash() { }
+val userName = "test"
+
+// Constants: UPPER_SNAKE_CASE
+const val MAX_RETRY_COUNT = 3
+
+// Composable functions: UpperCamelCase
+@Composable
+fun UserProfileScreen() { }
+```
+
+### Jetpack Compose conventions
+
+- Composable functions use UpperCamelCase naming
+- Use `Modifier` as the first optional parameter
+- State Hoisting: lift state up to the caller
+- Avoid side effects in composables; use `LaunchedEffect`
+
+### Architecture
+
+- **MVVM**: View → ViewModel → Repository → Data Source
+- **Unidirectional data flow**: UI notifies ViewModel via events; ViewModel updates UI via state
+
+## Testing
+
+- New business logic should include unit tests
+- Bug fixes should add regression tests
+- Critical utilities (encryption, hashing, etc.) must have full test coverage
+
+```bash
+# Run all unit tests
+./gradlew test
+
+# Run Android instrumentation tests
+./gradlew connectedAndroidTest
+```
+
+## Reporting Issues
+
+### Bug reports
+
+Open a [GitHub Issue](https://github.com/dffgjht/memo-amber/issues) with:
+
+1. Bug description
+2. Reproduction steps
+3. Expected vs. actual behavior
+4. Environment info (Android version, device model, app version)
+5. Relevant logs or screenshots
+
+### Feature requests
+
+Also via Issues — use the `enhancement` label and describe the use case and expected behavior.
+
+---
+
+Thank you for contributing! Every contribution makes Memo Amber better. 🎉
+
+---
+---
+
+<a id="中文"></a>
+# 🇨🇳 贡献指南
 
 感谢你对 **记忆琥珀（MemoAmber）** 项目的关注！我们欢迎任何形式的贡献。
 
