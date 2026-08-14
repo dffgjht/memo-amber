@@ -11,6 +11,7 @@ import com.memoamber.data.entities.MediaItem
 import com.memoamber.data.entities.CommunityPost
 import com.memoamber.data.entities.CommunityComment
 import com.memoamber.data.entities.User
+import com.memoamber.data.entities.Contact
 
 @Database(
     entities = [
@@ -20,9 +21,10 @@ import com.memoamber.data.entities.User
         MediaItem::class,
         CommunityPost::class,
         CommunityComment::class,
-        User::class
+        User::class,
+        Contact::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class MemoAmberDatabase : RoomDatabase() {
@@ -33,6 +35,7 @@ abstract class MemoAmberDatabase : RoomDatabase() {
     abstract fun communityPostDao(): CommunityPostDao
     abstract fun communityCommentDao(): CommunityCommentDao
     abstract fun userDao(): UserDao
+    abstract fun contactDao(): ContactDao
 
     companion object {
         @Volatile

@@ -28,6 +28,7 @@ fun HomeScreen(
     onNavigateToWill: () -> Unit,
     onNavigateToGallery: () -> Unit,
     onNavigateToCommunity: () -> Unit,
+    onNavigateToContacts: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     // 入场动画
@@ -122,6 +123,14 @@ fun HomeScreen(
                     gradient = AmberGradients.community,
                     iconTint = Color(0xFF3B82F6),
                     onClick = onNavigateToCommunity
+                ),
+                FeatureItem(
+                    icon = Icons.Default.Contacts,
+                    title = "关系人",
+                    subtitle = "重要的人档案",
+                    gradient = AmberGradients.will,
+                    iconTint = Color(0xFFF59E0B),
+                    onClick = onNavigateToContacts
                 ),
                 FeatureItem(
                     icon = Icons.Default.Security,

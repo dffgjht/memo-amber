@@ -82,6 +82,7 @@ class MainActivity : FragmentActivity() {
                                 onNavigateToWill = { navController.navigate("will") },
                                 onNavigateToGallery = { navController.navigate("gallery") },
                                 onNavigateToCommunity = { navController.navigate("community") },
+                                onNavigateToContacts = { navController.navigate("contacts") },
                                 onNavigateToSettings = { navController.navigate("settings") }
                             )
                         }
@@ -112,6 +113,12 @@ class MainActivity : FragmentActivity() {
 
                         composable("community") {
                             CommunityScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("contacts") {
+                            ContactsScreen(
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

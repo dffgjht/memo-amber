@@ -17,6 +17,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.memoamber.data.MemoAmberDatabase
 import com.memoamber.data.entities.VaultItem
+import com.memoamber.ui.components.SwipeToDeleteContainer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -29,6 +30,8 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
     var showAddDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var editingItem by remember { mutableStateOf<VaultItem?>(null) }
+    var pendingDelete by remember { mutableStateOf<VaultItem?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
     
     // 使用 MutableStateFlow 管理数据
     val itemsFlow = remember { MutableStateFlow<List<VaultItem>>(emptyList()) }
@@ -69,6 +72,7 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("密码保险箱", fontWeight = FontWeight.Bold) },
@@ -148,7 +152,11 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredItems, key = { it.id }) { item ->
-                        VaultItemCard(item = item, onClick = { editingItem = item })
+                        SwipeToDeleteContainer(
+                            onDelete = { pendingDelete = item }
+                        ) {
+                            VaultItemCard(item = item, onClick = { editingItem = item })
+                        }
                     }
                 }
             }
@@ -235,6 +243,32 @@ fun VaultScreen(onNavigateBack: () -> Unit) {
                     editingItem = null
                 }
             }
+        )
+    }
+
+    // 左滑删除确认
+    pendingDelete?.let { item ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text("删除项目") },
+            text = { Text("确定要删除「${item.title}」吗？此操作不可撤销。") },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        withContext(Dispatchers.IO) {
+                            try {
+                                val database = MemoAmberDatabase.getDatabase(context)
+                                val dao = database.vaultItemDao()
+                                dao.deleteItem(item)
+                            } catch (e: Exception) { e.printStackTrace() }
+                        }
+                        loadItems()
+                        pendingDelete = null
+                        snackbarHostState.showSnackbar("项目已删除")
+                    }
+                }) { Text("删除", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("取消") } }
         )
     }
 }
@@ -398,6 +432,7 @@ fun EditVaultItemDialog(
     var content by remember { mutableStateOf(item.content) }
     var username by remember { mutableStateOf(item.username) }
     var password by remember { mutableStateOf("") }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -458,7 +493,7 @@ fun EditVaultItemDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
-                        onClick = onDelete,
+                        onClick = { showDeleteConfirm = true },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error
                         )
@@ -487,5 +522,20 @@ fun EditVaultItemDialog(
                 }
             }
         }
+    }
+
+    // 删除确认
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text("删除项目") },
+            text = { Text("确定要删除「${item.title}」吗？此操作不可撤销。") },
+            confirmButton = {
+                TextButton(onClick = { onDelete() }) {
+                    Text("删除", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { showDeleteConfirm = false }) { Text("取消") } }
+        )
     }
 }

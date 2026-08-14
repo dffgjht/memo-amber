@@ -39,6 +39,9 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("全部", "照片", "视频")
     var selectedMedia by remember { mutableStateOf<MediaItem?>(null) }
+    var editingMedia by remember { mutableStateOf<MediaItem?>(null) }
+    var pendingDelete by remember { mutableStateOf<MediaItem?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
     
     // 使用 MutableStateFlow 管理数据
     val mediaItemsFlow = remember { MutableStateFlow<List<MediaItem>>(emptyList()) }
@@ -152,6 +155,7 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { 
@@ -251,7 +255,66 @@ fun GalleryScreen(onNavigateBack: () -> Unit) {
     selectedMedia?.let { media ->
         MediaPreviewDialog(
             media = media,
-            onDismiss = { selectedMedia = null }
+            onDismiss = { selectedMedia = null },
+            onEdit = {
+                selectedMedia = null
+                editingMedia = media
+            },
+            onDelete = {
+                selectedMedia = null
+                pendingDelete = media
+            }
+        )
+    }
+
+    // 编辑对话框
+    editingMedia?.let { media ->
+        EditMediaDialog(
+            media = media,
+            onDismiss = { editingMedia = null },
+            onSave = { newTitle, newDesc ->
+                scope.launch {
+                    withContext(Dispatchers.IO) {
+                        try {
+                            val database = MemoAmberDatabase.getDatabase(context)
+                            val dao = database.mediaItemDao()
+                            dao.updateItem(
+                                media.copy(
+                                    title = newTitle,
+                                    description = newDesc
+                                )
+                            )
+                        } catch (e: Exception) { e.printStackTrace() }
+                    }
+                    loadMedia()
+                    editingMedia = null
+                    snackbarHostState.showSnackbar("已保存")
+                }
+            }
+        )
+    }
+
+    // 删除确认
+    pendingDelete?.let { media ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text("删除回忆") },
+            text = { Text("确定要删除「${media.title}」吗？此操作不可撤销。") },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        withContext(Dispatchers.IO) {
+                            try {
+                                MemoAmberDatabase.getDatabase(context).mediaItemDao().deleteItemById(media.id)
+                            } catch (e: Exception) { e.printStackTrace() }
+                        }
+                        loadMedia()
+                        pendingDelete = null
+                        snackbarHostState.showSnackbar("已删除")
+                    }
+                }) { Text("删除", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("取消") } }
         )
     }
 
@@ -415,7 +478,9 @@ fun AddMediaDialog(
 @Composable
 fun MediaPreviewDialog(
     media: MediaItem,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -435,14 +500,26 @@ fun MediaPreviewDialog(
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = media.title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f)
                     )
+                    // 编辑按钮
+                    IconButton(onClick = onEdit) {
+                        Icon(Icons.Default.Edit, contentDescription = "编辑",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                    // 删除按钮
+                    IconButton(onClick = onDelete) {
+                        Icon(Icons.Default.Delete, contentDescription = "删除",
+                            tint = MaterialTheme.colorScheme.error)
+                    }
                     IconButton(onClick = onDismiss) {
                         Icon(Icons.Default.Close, contentDescription = "关闭",
                             tint = MaterialTheme.colorScheme.onPrimaryContainer)
@@ -465,6 +542,67 @@ fun MediaPreviewDialog(
                             modifier = Modifier.fillMaxSize(),
                             contentScale = androidx.compose.ui.layout.ContentScale.Fit
                         )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditMediaDialog(
+    media: MediaItem,
+    onDismiss: () -> Unit,
+    onSave: (String, String) -> Unit
+) {
+    var title by remember { mutableStateOf(media.title) }
+    var description by remember { mutableStateOf(media.description) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier.fillMaxWidth(0.9f),
+            shape = RoundedCornerShape(24.dp)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text("编辑回忆",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold)
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("标题") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("描述") },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp),
+                    minLines = 3
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("取消")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = { onSave(title, description) },
+                        enabled = title.isNotBlank()
+                    ) {
+                        Text("保存")
                     }
                 }
             }

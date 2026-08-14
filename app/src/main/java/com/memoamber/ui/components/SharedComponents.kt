@@ -3,8 +3,11 @@ package com.memoamber.ui.components
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,10 +17,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.memoamber.ui.theme.*
+import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 // ═══════════════════════════════════════════════════════
 // 琥珀渐变色
@@ -198,12 +206,6 @@ fun AmberWelcomeBanner(
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White.copy(alpha = 0.85f)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "v1.5.0",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(alpha = 0.6f)
-                )
             }
         }
     }
@@ -226,6 +228,79 @@ fun AmberLockBackground(
         contentAlignment = Alignment.Center
     ) {
         content()
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// 通用左滑删除容器 — 列表项左滑显示删除背景并触发 onDelete
+// ═══════════════════════════════════════════════════════
+@Composable
+fun SwipeToDeleteContainer(
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    val density = LocalDensity.current
+    val thresholdPx = with(density) { 140.dp.toPx() }
+    val maxSwipePx = with(density) { 240.dp.toPx() }
+    val offsetX = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
+    Box(modifier = modifier) {
+        // 删除背景（左滑时露出）
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.errorContainer),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Row(
+                modifier = Modifier.padding(end = 28.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "删除",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "删除",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+
+        // 前景卡片（跟随手指滑动）
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            scope.launch {
+                                if (offsetX.value <= -thresholdPx) {
+                                    onDelete()
+                                    offsetX.snapTo(0f)
+                                } else {
+                                    offsetX.animateTo(0f, animationSpec = tween(220))
+                                }
+                            }
+                        },
+                        onHorizontalDrag = { change, dragAmount ->
+                            change.consume()
+                            scope.launch {
+                                offsetX.snapTo((offsetX.value + dragAmount).coerceIn(-maxSwipePx, 0f))
+                            }
+                        }
+                    )
+                }
+        ) {
+            content()
+        }
     }
 }
 

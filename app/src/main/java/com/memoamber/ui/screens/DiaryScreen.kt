@@ -27,6 +27,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.memoamber.data.MemoAmberDatabase
 import com.memoamber.data.entities.DiaryEntry
+import com.memoamber.ui.components.SwipeToDeleteContainer
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -126,12 +127,16 @@ fun DiaryScreen(onNavigateBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(entries, key = { it.id }) { entry ->
-                    DiaryEntryCard(
-                        entry = entry,
-                        onClick = { selectedEntry = entry },
-                        onEdit = { editingEntry = entry; showEditDialog = true },
+                    SwipeToDeleteContainer(
                         onDelete = { pendingDelete = entry }
-                    )
+                    ) {
+                        DiaryEntryCard(
+                            entry = entry,
+                            onClick = { selectedEntry = entry },
+                            onEdit = { editingEntry = entry; showEditDialog = true },
+                            onDelete = { pendingDelete = entry }
+                        )
+                    }
                 }
                 item { Spacer(modifier = Modifier.height(80.dp)) }
             }
