@@ -2,19 +2,26 @@ package com.memoamber.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.memoamber.data.MemoAmberDatabase
 import com.memoamber.data.entities.Contact
 import com.memoamber.ui.components.SwipeToDeleteContainer
@@ -163,7 +172,25 @@ fun ContactsScreen(onNavigateBack: () -> Unit) {
         if (showActionMenu) {
             AlertDialog(
                 onDismissRequest = { showActionMenu = false; selectedContact = null },
-                title = { Text(contact.name) },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (contact.avatarPath.isNotBlank()) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(context)
+                                    .data(Uri.parse(contact.avatarPath))
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = contact.name,
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                        }
+                        Text(contact.name)
+                    }
+                },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
@@ -251,6 +278,7 @@ fun ContactCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val context = LocalContext.current
     var menuExpanded by remember { mutableStateOf(false) }
 
     Card(
@@ -264,22 +292,36 @@ fun ContactCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 头像（首字母）
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        contactAvatarColor(contact.name),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = contact.name.take(1).uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+            // 头像（有图显示图片，无图显示首字母）
+            if (contact.avatarPath.isNotBlank()) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(Uri.parse(contact.avatarPath))
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = contact.name,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            contactAvatarColor(contact.name),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = contact.name.take(1).uppercase(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -371,6 +413,23 @@ fun ContactEditDialog(
     var phone by remember { mutableStateOf(initial?.phone ?: "") }
     var email by remember { mutableStateOf(initial?.email ?: "") }
     var notes by remember { mutableStateOf(initial?.notes ?: "") }
+    var avatarPath by remember { mutableStateOf(initial?.avatarPath ?: "") }
+    val context = LocalContext.current
+
+    // 头像选择器
+    val avatarPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {}
+            avatarPath = uri.toString()
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -412,6 +471,7 @@ fun ContactEditDialog(
                                         email = email.trim(),
                                         relationship = relationship.trim(),
                                         notes = notes.trim(),
+                                        avatarPath = avatarPath,
                                         timestamp = initial?.timestamp ?: System.currentTimeMillis()
                                     )
                                 )
@@ -431,9 +491,84 @@ fun ContactEditDialog(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
+                    // 头像上传区
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(96.dp)
+                                .clip(CircleShape)
+                                .clickable { avatarPickerLauncher.launch("image/*") }
+                        ) {
+                            if (avatarPath.isNotBlank()) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(context)
+                                        .data(Uri.parse(avatarPath))
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = "头像",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            if (name.isBlank()) MaterialTheme.colorScheme.surfaceVariant
+                                            else contactAvatarColor(name),
+                                            CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (name.isBlank()) {
+                                        Icon(
+                                            Icons.Default.Person,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(48.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    } else {
+                                        Text(
+                                            text = name.take(1).uppercase(),
+                                            style = MaterialTheme.typography.headlineMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                            // 相机角标
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.PhotoCamera,
+                                    contentDescription = "更换头像",
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
+                    }
+                    Text(
+                        text = "点击头像从相册选择（留空则显示姓名首字母）",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },

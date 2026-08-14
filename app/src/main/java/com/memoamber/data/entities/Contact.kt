@@ -17,5 +17,6 @@ data class Contact(
     val email: String = "",         // 邮箱
     val relationship: String = "",  // 双方关系（家人/朋友/同事等）
     val notes: String = "",         // 备注
+    val avatarPath: String = "",    // 头像（content:// URI 或本地路径）
     val timestamp: Long
 )

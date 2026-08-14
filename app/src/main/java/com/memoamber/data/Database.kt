@@ -24,7 +24,7 @@ import com.memoamber.data.entities.Contact
         User::class,
         Contact::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class MemoAmberDatabase : RoomDatabase() {
