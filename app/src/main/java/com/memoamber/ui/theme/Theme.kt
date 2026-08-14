@@ -13,107 +13,107 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 // ═══════════════════════════════════════════════════════
-// 记忆琥珀 — 琥珀暖色调主题
+// 记忆琥珀 — Apple 质感主题
+// 画布 #F5F5F7 · 品牌蓝 #0071E3 · 注释灰 #86868B
 // ═══════════════════════════════════════════════════════
 
-// Light Theme — 温暖琥珀色
-private val AmberLightPrimary = Color(0xFFB45309)        // amber-700
-private val AmberLightOnPrimary = Color(0xFFFFFFFF)
-private val AmberLightPrimaryContainer = Color(0xFFFFF3E0) // amber-50
-private val AmberLightOnPrimaryContainer = Color(0xFF78350F) // amber-900
-private val AmberLightSecondary = Color(0xFFD97706)      // amber-600
-private val AmberLightOnSecondary = Color(0xFFFFFFFF)
-private val AmberLightSecondaryContainer = Color(0xFFFFECB3) // amber-100
-private val AmberLightOnSecondaryContainer = Color(0xFF78350F)
-private val AmberLightTertiary = Color(0xFF92400E)       // amber-800
-private val AmberLightOnTertiary = Color(0xFFFFFFFF)
-private val AmberLightTertiaryContainer = Color(0xFFFDE68A) // amber-200
-private val AmberLightOnTertiaryContainer = Color(0xFF78350F)
-private val AmberLightBackground = Color(0xFFFFFBF5)     // warm white
-private val AmberLightOnBackground = Color(0xFF1C1917)   // stone-900
-private val AmberLightSurface = Color(0xFFFFFFFF)
-private val AmberLightOnSurface = Color(0xFF1C1917)
-private val AmberLightSurfaceVariant = Color(0xFFF5F0EB)
-private val AmberLightOnSurfaceVariant = Color(0xFF57534E) // stone-600
-private val AmberLightOutline = Color(0xFFD6D3D1)        // stone-300
-private val AmberLightError = Color(0xFFDC2626)          // red-600
-private val AmberLightOnError = Color(0xFFFFFFFF)
+// ── Light — Apple 浅色 ──────────────────────────────
+private val AppleLightPrimary = Color(0xFF0071E3)        // Apple 品牌蓝
+private val AppleLightOnPrimary = Color(0xFFFFFFFF)
+private val AppleLightPrimaryContainer = Color(0xFFE8F2FF) // 浅蓝
+private val AppleLightOnPrimaryContainer = Color(0xFF003A66)
+private val AppleLightSecondary = Color(0xFF86868B)      // 注释灰
+private val AppleLightOnSecondary = Color(0xFFFFFFFF)
+private val AppleLightSecondaryContainer = Color(0xFFE5E5EA) // 次级按钮灰
+private val AppleLightOnSecondaryContainer = Color(0xFF1D1D1F)
+private val AppleLightTertiary = Color(0xFFB45309)       // 琥珀 — 品牌点缀
+private val AppleLightOnTertiary = Color(0xFFFFFFFF)
+private val AppleLightTertiaryContainer = Color(0xFFFFF3E0)
+private val AppleLightOnTertiaryContainer = Color(0xFF78350F)
+private val AppleLightBackground = Color(0xFFF5F5F7)     // Apple 画布
+private val AppleLightOnBackground = Color(0xFF1D1D1F)   // 近黑
+private val AppleLightSurface = Color(0xFFFFFFFF)
+private val AppleLightOnSurface = Color(0xFF1D1D1F)
+private val AppleLightSurfaceVariant = Color(0xFFF2F2F7) // 输入框灰
+private val AppleLightOnSurfaceVariant = Color(0xFF86868B) // 注释灰
+private val AppleLightOutline = Color(0xFFD1D1D6)        // hairline
+private val AppleLightError = Color(0xFFFF3B30)          // Apple 红
 
-// Dark Theme — 深色琥珀
-private val AmberDarkPrimary = Color(0xFFFCD34D)         // amber-300
-private val AmberDarkOnPrimary = Color(0xFF78350F)       // amber-900
-private val AmberDarkPrimaryContainer = Color(0xFF92400E) // amber-800
-private val AmberDarkOnPrimaryContainer = Color(0xFFFDE68A) // amber-200
-private val AmberDarkSecondary = Color(0xFFFBBF24)       // amber-400
-private val AmberDarkOnSecondary = Color(0xFF78350F)
-private val AmberDarkSecondaryContainer = Color(0xFFB45309) // amber-700
-private val AmberDarkOnSecondaryContainer = Color(0xFFFDE68A)
-private val AmberDarkTertiary = Color(0xFFF59E0B)        // amber-500
-private val AmberDarkOnTertiary = Color(0xFF78350F)
-private val AmberDarkTertiaryContainer = Color(0xFFD97706) // amber-600
-private val AmberDarkOnTertiaryContainer = Color(0xFFFFFBEB) // amber-50
-private val AmberDarkBackground = Color(0xFF1C1917)      // stone-900
-private val AmberDarkOnBackground = Color(0xFFF5F5F4)    // stone-100
-private val AmberDarkSurface = Color(0xFF292524)         // stone-800
-private val AmberDarkOnSurface = Color(0xFFF5F5F4)
-private val AmberDarkSurfaceVariant = Color(0xFF44403C)  // stone-700
-private val AmberDarkOnSurfaceVariant = Color(0xFFA8A29E) // stone-400
-private val AmberDarkOutline = Color(0xFF78716C)         // stone-500
-private val AmberDarkError = Color(0xFFFCA5A5)           // red-300
-private val AmberDarkOnError = Color(0xFF7F1D1D)         // red-900
+// ── Dark — Apple 深色 ───────────────────────────────
+private val AppleDarkPrimary = Color(0xFF0A84FF)
+private val AppleDarkOnPrimary = Color(0xFFFFFFFF)
+private val AppleDarkPrimaryContainer = Color(0xFF003A66)
+private val AppleDarkOnPrimaryContainer = Color(0xFFA5CFFF)
+private val AppleDarkSecondary = Color(0xFF98989D)
+private val AppleDarkOnSecondary = Color(0xFF000000)
+private val AppleDarkSecondaryContainer = Color(0xFF2C2C2E)
+private val AppleDarkOnSecondaryContainer = Color(0xFFE5E5EA)
+private val AppleDarkTertiary = Color(0xFFFBBF24)
+private val AppleDarkOnTertiary = Color(0xFF1C1917)
+private val AppleDarkTertiaryContainer = Color(0xFF92400E)
+private val AppleDarkOnTertiaryContainer = Color(0xFFFDE68A)
+private val AppleDarkBackground = Color(0xFF000000)
+private val AppleDarkOnBackground = Color(0xFFF5F5F7)
+private val AppleDarkSurface = Color(0xFF1C1C1E)
+private val AppleDarkOnSurface = Color(0xFFF5F5F7)
+private val AppleDarkSurfaceVariant = Color(0xFF2C2C2E)
+private val AppleDarkOnSurfaceVariant = Color(0xFF98989D)
+private val AppleDarkOutline = Color(0xFF48484A)
+private val AppleDarkError = Color(0xFFFF453A)
+private val AppleDarkOnError = Color(0xFFFFFFFF)
 
 private val LightColorScheme = lightColorScheme(
-    primary = AmberLightPrimary,
-    onPrimary = AmberLightOnPrimary,
-    primaryContainer = AmberLightPrimaryContainer,
-    onPrimaryContainer = AmberLightOnPrimaryContainer,
-    secondary = AmberLightSecondary,
-    onSecondary = AmberLightOnSecondary,
-    secondaryContainer = AmberLightSecondaryContainer,
-    onSecondaryContainer = AmberLightOnSecondaryContainer,
-    tertiary = AmberLightTertiary,
-    onTertiary = AmberLightOnTertiary,
-    tertiaryContainer = AmberLightTertiaryContainer,
-    onTertiaryContainer = AmberLightOnTertiaryContainer,
-    background = AmberLightBackground,
-    onBackground = AmberLightOnBackground,
-    surface = AmberLightSurface,
-    onSurface = AmberLightOnSurface,
-    surfaceVariant = AmberLightSurfaceVariant,
-    onSurfaceVariant = AmberLightOnSurfaceVariant,
-    outline = AmberLightOutline,
-    error = AmberLightError,
-    onError = AmberLightOnError,
+    primary = AppleLightPrimary,
+    onPrimary = AppleLightOnPrimary,
+    primaryContainer = AppleLightPrimaryContainer,
+    onPrimaryContainer = AppleLightOnPrimaryContainer,
+    secondary = AppleLightSecondary,
+    onSecondary = AppleLightOnSecondary,
+    secondaryContainer = AppleLightSecondaryContainer,
+    onSecondaryContainer = AppleLightOnSecondaryContainer,
+    tertiary = AppleLightTertiary,
+    onTertiary = AppleLightOnTertiary,
+    tertiaryContainer = AppleLightTertiaryContainer,
+    onTertiaryContainer = AppleLightOnTertiaryContainer,
+    background = AppleLightBackground,
+    onBackground = AppleLightOnBackground,
+    surface = AppleLightSurface,
+    onSurface = AppleLightOnSurface,
+    surfaceVariant = AppleLightSurfaceVariant,
+    onSurfaceVariant = AppleLightOnSurfaceVariant,
+    outline = AppleLightOutline,
+    error = AppleLightError,
+    onError = Color.White,
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = AmberDarkPrimary,
-    onPrimary = AmberDarkOnPrimary,
-    primaryContainer = AmberDarkPrimaryContainer,
-    onPrimaryContainer = AmberDarkOnPrimaryContainer,
-    secondary = AmberDarkSecondary,
-    onSecondary = AmberDarkOnSecondary,
-    secondaryContainer = AmberDarkSecondaryContainer,
-    onSecondaryContainer = AmberDarkOnSecondaryContainer,
-    tertiary = AmberDarkTertiary,
-    onTertiary = AmberDarkOnTertiary,
-    tertiaryContainer = AmberDarkTertiaryContainer,
-    onTertiaryContainer = AmberDarkOnTertiaryContainer,
-    background = AmberDarkBackground,
-    onBackground = AmberDarkOnBackground,
-    surface = AmberDarkSurface,
-    onSurface = AmberDarkOnSurface,
-    surfaceVariant = AmberDarkSurfaceVariant,
-    onSurfaceVariant = AmberDarkOnSurfaceVariant,
-    outline = AmberDarkOutline,
-    error = AmberDarkError,
-    onError = AmberDarkOnError,
+    primary = AppleDarkPrimary,
+    onPrimary = AppleDarkOnPrimary,
+    primaryContainer = AppleDarkPrimaryContainer,
+    onPrimaryContainer = AppleDarkOnPrimaryContainer,
+    secondary = AppleDarkSecondary,
+    onSecondary = AppleDarkOnSecondary,
+    secondaryContainer = AppleDarkSecondaryContainer,
+    onSecondaryContainer = AppleDarkOnSecondaryContainer,
+    tertiary = AppleDarkTertiary,
+    onTertiary = AppleDarkOnTertiary,
+    tertiaryContainer = AppleDarkTertiaryContainer,
+    onTertiaryContainer = AppleDarkOnTertiaryContainer,
+    background = AppleDarkBackground,
+    onBackground = AppleDarkOnBackground,
+    surface = AppleDarkSurface,
+    onSurface = AppleDarkOnSurface,
+    surfaceVariant = AppleDarkSurfaceVariant,
+    onSurfaceVariant = AppleDarkOnSurfaceVariant,
+    outline = AppleDarkOutline,
+    error = AppleDarkError,
+    onError = AppleDarkOnError,
 )
 
 @Composable
 fun MemoAmberTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // 关闭动态色，使用品牌琥珀色
+    dynamicColor: Boolean = false, // 关闭动态色，使用品牌蓝
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -129,7 +129,7 @@ fun MemoAmberTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            // 状态栏使用半透明琥珀色
+            // 状态栏使用画布底色
             window.statusBarColor = colorScheme.background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
             // 导航栏

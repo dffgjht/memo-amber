@@ -6,46 +6,48 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+// Apple Big Type — 系统字体栈（Android 上即 PingFang SC / SF Pro 同源），
+// 标题粗黑 700，正文 400，注释 400 + 灰；字间距微缩 -0.02em 量级。
 val Typography = Typography(
     // 大标题 — 首页欢迎语
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        lineHeight = 40.sp,
-        letterSpacing = (-0.5).sp
+        fontSize = 34.sp,
+        lineHeight = 41.sp,
+        letterSpacing = (-0.7).sp
     ),
     // 中标题 — 页面标题
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
-        lineHeight = 36.sp,
-        letterSpacing = 0.sp
+        lineHeight = 34.sp,
+        letterSpacing = (-0.4).sp
     ),
     // 小标题 — 卡片标题
     headlineSmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 0.sp
+        lineHeight = 30.sp,
+        letterSpacing = (-0.3).sp
     ),
     // 大标题 — 区域标题
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        lineHeight = 26.sp,
+        letterSpacing = (-0.2).sp
     ),
     // 中标题 — 列表项标题
     titleMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.15.sp
+        lineHeight = 22.sp,
+        letterSpacing = (-0.1).sp
     ),
     // 小标题 — 标签等
     titleSmall = TextStyle(
@@ -53,7 +55,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
+        letterSpacing = 0.sp
     ),
     // 正文大
     bodyLarge = TextStyle(
@@ -61,7 +63,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.1.sp
     ),
     // 正文
     bodyMedium = TextStyle(
@@ -69,7 +71,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        letterSpacing = 0.25.sp
+        letterSpacing = 0.1.sp
     ),
     // 正文小
     bodySmall = TextStyle(
@@ -77,15 +79,15 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.4.sp
+        letterSpacing = 0.1.sp
     ),
     // 标签大
     labelLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
+        letterSpacing = 0.sp
     ),
     // 标签
     labelMedium = TextStyle(
@@ -93,7 +95,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.sp
     ),
     // 标签小
     labelSmall = TextStyle(
@@ -101,6 +103,6 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.sp
     )
 )
